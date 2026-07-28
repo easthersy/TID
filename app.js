@@ -1102,14 +1102,9 @@ function setupLoginSystem() {
             // Buka borang log masuk
             loginForm.style.display = 'block';
 
-            if (role === 'Anak Murid') {
-                passcodeGroup.style.display = 'none';
-                document.getElementById('login-passcode').removeAttribute('required');
-            } else {
-                passcodeGroup.style.display = 'block';
-                document.getElementById('login-passcode').setAttribute('required', 'required');
-                document.getElementById('passcode-label').innerText = `Kata Laluan ${role}`;
-            }
+            passcodeGroup.style.display = 'block';
+            document.getElementById('login-passcode').setAttribute('required', 'required');
+            document.getElementById('passcode-label').innerText = `Kata Laluan ${role}`;
         });
     });
 
@@ -1136,7 +1131,7 @@ function setupLoginSystem() {
                 isCorrect = true;
             } else if (role === 'Cikgu' && passcode === 'cikgu123') {
                 isCorrect = true;
-            } else if (role === 'Anak Murid') {
+            } else if (role === 'Anak Murid' && passcode === 'murid123') {
                 isCorrect = true;
             }
 
