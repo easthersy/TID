@@ -1,0 +1,59 @@
+[
+    {
+        "id": "std_farhan10",
+        "name": "Muhammad Farhan Bin Roslan",
+        "gender": "Lelaki",
+        "age": 10,
+        "height": 138.2,
+        "weight": 31.5,
+        "school": "SK Taman Tun Dr Ismail",
+        "class": "4 Cerdik",
+        "created_at": "2026-07-28 12:00:00",
+        "scores": {
+            "sit_reach": [22, 24, 25],
+            "sit_up": [18, 20],
+            "long_jump": [160, 165],
+            "sprint_10m": [2.1],
+            "shuttle_run": [10.2, 9.8],
+            "hand_eye": [15]
+        }
+    },
+    {
+        "id": "std_aishah11",
+        "name": "Aishah Humaira Binti Mohd Yazid",
+        "gender": "Perempuan",
+        "age": 11,
+        "height": 142.0,
+        "weight": 34.0,
+        "school": "SK Taman Tun Dr Ismail",
+        "class": "5 Bestari",
+        "created_at": "2026-07-28 12:05:00",
+        "scores": {
+            "sit_reach": [32, 34, 35],
+            "sit_up": [14, 15],
+            "long_jump": [120, 125],
+            "sprint_10m": [2.6],
+            "shuttle_run": [12.4, 12.0],
+            "hand_eye": [19]
+        }
+    },
+    {
+        "id": "std_weijie9",
+        "name": "Chong Wei Jie",
+        "gender": "Lelaki",
+        "age": 9,
+        "height": 128.5,
+        "weight": 33.4,
+        "school": "SK Taman Tun Dr Ismail",
+        "class": "3 Amanah",
+        "created_at": "2026-07-28 12:10:00",
+        "scores": {
+            "sit_reach": [12, 14, 15],
+            "sit_up": [8, 9],
+            "long_jump": [98, 102],
+            "sprint_10m": [3.2],
+            "shuttle_run": [14.8, 14.2],
+            "hand_eye": [16]
+        }
+    }
+]
