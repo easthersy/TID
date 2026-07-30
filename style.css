@@ -561,6 +561,7 @@ select.form-control {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    min-width: 0;
 }
 
 .trial-field label {
@@ -572,6 +573,8 @@ select.form-control {
 .trial-field input {
     text-align: center;
     font-weight: 600;
+    width: 100%;
+    min-width: 0;
 }
 
 /* Athlete Profile Dashboard & Detail Layout */
@@ -838,7 +841,13 @@ select.form-control {
     }
     
     .chart-card {
-        display: none !important; /* Hide charts in basic printing if they don't load canvas well */
+        display: flex !important;
+        background: #0c1330 !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        color: #fff !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        min-height: 380px !important;
     }
     
     .score-breakdown-item {

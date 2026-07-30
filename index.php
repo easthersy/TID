@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2pdf.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <!-- Custom Style Sheet -->
     <link rel="stylesheet" href="style.css">
 </head>
@@ -444,13 +446,16 @@
                         <button class="btn btn-secondary" onclick="switchTab('students')">
                             <i class="fa-solid fa-arrow-left"></i>Kembali
                         </button>
+                        <button class="btn btn-secondary" id="btn-download-admin-pdf" onclick="downloadAdminPDF()">
+                            <i class="fa-solid fa-file-pdf"></i> Muat Turun PDF
+                        </button>
                         <button class="btn btn-primary" onclick="window.print()">
                             <i class="fa-solid fa-print"></i>Cetak Laporan
                         </button>
                     </div>
                 </div>
 
-                <div class="profile-grid">
+                <div class="profile-grid" id="admin-profile-grid">
                     <!-- Left Sidebar Profile -->
                     <div class="card profile-sidebar-card">
                         <div class="avatar-container">

@@ -1277,7 +1277,10 @@ function showStudentPortalReport(id) {
                     <li><span>Status BMI:</span><span class="badge ${bmiResult.class}">${bmiResult.status}</span></li>
                 </ul>
                 
-                <button class="btn btn-secondary" onclick="window.print()" style="margin-top: 1rem; width: 100%; justify-content: center;">
+                <button class="btn btn-primary" id="btn-download-student-pdf" onclick="downloadStudentPDF()" style="margin-top: 1rem; width: 100%; justify-content: center;">
+                    <i class="fa-solid fa-file-pdf"></i> Muat Turun PDF Laporan
+                </button>
+                <button class="btn btn-secondary" onclick="window.print()" style="margin-top: 0.5rem; width: 100%; justify-content: center;">
                     <i class="fa-solid fa-print"></i> Cetak Profil Saya
                 </button>
             </div>
@@ -1446,4 +1449,159 @@ function renderStudentPortalRadarChart(labels, data) {
             }
         }
     });
+}
+
+// --- FUNGSI MUAT TURUN PDF (TID ANALYST) ---
+function downloadPDF(elementId, studentName, buttonId) {
+    const originalElement = document.getElementById(elementId);
+    if (!originalElement) {
+        console.error('Element not found:', elementId);
+        return;
+    }
+
+    const btn = document.getElementById(buttonId);
+    const originalText = btn ? btn.innerHTML : '';
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menjana PDF...';
+    }
+
+    // Buat salinan (clone) untuk dipaparkan secara berasingan bagi cetakan PDF
+    const element = originalElement.cloneNode(true);
+    
+    // Salin data lukisan (bitmap) daripada kanvas asal ke kanvas salinan
+    const originalCanvases = originalElement.querySelectorAll('canvas');
+    const clonedCanvases = element.querySelectorAll('canvas');
+    
+    for (let i = 0; i < originalCanvases.length; i++) {
+        const sourceCanvas = originalCanvases[i];
+        const destCanvas = clonedCanvases[i];
+        if (sourceCanvas && destCanvas) {
+            destCanvas.width = sourceCanvas.width;
+            destCanvas.height = sourceCanvas.height;
+            const destCtx = destCanvas.getContext('2d');
+            destCtx.drawImage(sourceCanvas, 0, 0);
+        }
+    }
+    
+    // Tetapkan gaya kedudukan klon di luar skrin dengan lebar desktop tetap agar responsif
+    element.style.position = 'absolute';
+    element.style.left = '-9999px';
+    element.style.top = '0';
+    element.style.width = '1024px';
+    element.style.background = '#060919';
+    element.style.color = '#ffffff';
+    element.style.padding = '30px';
+    element.style.borderRadius = '16px';
+    element.style.boxSizing = 'border-box';
+    document.body.appendChild(element);
+
+    // Paksa paparan skrin asal (langkau gaya media print CSS yang menyembunyikan carta/avatar)
+    const grids = element.querySelectorAll('.profile-grid');
+    grids.forEach(grid => {
+        grid.style.setProperty('display', 'grid', 'important');
+        grid.style.setProperty('grid-template-columns', '320px 1fr', 'important');
+        grid.style.setProperty('gap', '2rem', 'important');
+    });
+
+    const chartCards = element.querySelectorAll('.chart-card');
+    chartCards.forEach(card => {
+        card.style.setProperty('display', 'block', 'important');
+    });
+
+    const sidebars = element.querySelectorAll('.profile-sidebar-card');
+    sidebars.forEach(sidebar => {
+        sidebar.style.setProperty('display', 'flex', 'important');
+        sidebar.style.setProperty('flex-direction', 'column', 'important');
+        sidebar.style.setProperty('text-align', 'center', 'important');
+        sidebar.style.setProperty('align-items', 'center', 'important');
+        sidebar.style.setProperty('border-bottom', 'none', 'important');
+        sidebar.style.setProperty('background', 'rgba(18, 26, 60, 0.4)', 'important');
+        sidebar.style.setProperty('border', '1px solid rgba(255, 255, 255, 0.1)', 'important');
+        sidebar.style.setProperty('color', '#ffffff', 'important');
+    });
+
+    const avatars = element.querySelectorAll('.avatar-container');
+    avatars.forEach(avatar => {
+        avatar.style.setProperty('display', 'block', 'important');
+    });
+
+    const visualsGrids = element.querySelectorAll('.visuals-grid');
+    visualsGrids.forEach(vg => {
+        vg.style.setProperty('display', 'grid', 'important');
+        vg.style.setProperty('grid-template-columns', 'repeat(auto-fit, minmax(320px, 1fr))', 'important');
+        vg.style.setProperty('gap', '2rem', 'important');
+    });
+
+    // Padam butang tindakan dalam salinan PDF
+    const actionsToHide = element.querySelectorAll('button, .btn');
+    actionsToHide.forEach(el => el.remove());
+
+    // Rekah banner kepala laporan (header)
+    const headerBanner = document.createElement('div');
+    headerBanner.style.borderBottom = '2px solid rgba(0, 242, 254, 0.2)';
+    headerBanner.style.paddingBottom = '15px';
+    headerBanner.style.marginBottom = '25px';
+    headerBanner.style.display = 'flex';
+    headerBanner.style.justifyContent = 'space-between';
+    headerBanner.style.alignItems = 'center';
+    headerBanner.style.fontFamily = "'Outfit', sans-serif";
+    
+    headerBanner.innerHTML = `
+        <div>
+            <h1 style="color: #fff; font-size: 24px; margin: 0; font-weight: 700;">Laporan Prestasi & Analisis TID</h1>
+            <p style="color: #9aa8e3; font-size: 13px; margin: 5px 0 0 0;">Sistem Analisis Talent Identification Sekolah Rendah</p>
+        </div>
+        <div style="text-align: right;">
+            <span style="color: #00f2fe; font-weight: 700; font-size: 18px;">TID Analyst</span>
+            <p style="color: #64748b; font-size: 11px; margin: 3px 0 0 0;">Tarikh Cetakan: ${new Date().toLocaleDateString('ms-MY')}</p>
+        </div>
+    `;
+    element.insertBefore(headerBanner, element.firstChild);
+
+    // Konfigurasi untuk html2pdf
+    const opt = {
+        margin:       [0.4, 0.4, 0.4, 0.4],
+        filename:     `Laporan_TID_${studentName.trim().replace(/\s+/g, '_')}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { 
+            scale: 2, 
+            useCORS: true, 
+            backgroundColor: '#060919',
+            logging: false,
+            windowWidth: 1024,
+            media: 'screen'
+        },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
+        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+    };
+
+    // Jalankan html2pdf
+    html2pdf().set(opt).from(element).save().then(() => {
+        element.remove();
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    }).catch(err => {
+        console.error('PDF Generation Error:', err);
+        element.remove();
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+        alert('Ralat semasa menjana PDF. Sila cuba lagi.');
+    });
+}
+
+function downloadStudentPDF() {
+    const nameEl = document.querySelector('#student-portal-report-container h2');
+    const studentName = nameEl ? nameEl.innerText : 'Laporan_Murid';
+    downloadPDF('student-portal-report-container', studentName, 'btn-download-student-pdf');
+}
+
+function downloadAdminPDF() {
+    const nameEl = document.getElementById('prof-name');
+    const studentName = nameEl ? nameEl.innerText : 'Laporan_Atlet';
+    downloadPDF('admin-profile-grid', studentName, 'btn-download-admin-pdf');
 }
