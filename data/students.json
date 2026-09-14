@@ -4,18 +4,35 @@
         "name": "Muhammad Farhan Bin Roslan",
         "gender": "Lelaki",
         "age": 10,
-        "height": 138.2,
+        "height": 138.19999999999998863131622783839702606201171875,
         "weight": 31.5,
         "school": "SK Taman Tun Dr Ismail",
         "class": "4 Cerdik",
         "created_at": "2026-07-28 12:00:00",
         "scores": {
-            "sit_reach": [22, 24, 25],
-            "sit_up": [18, 20],
-            "long_jump": [160, 165],
-            "sprint_10m": [2.1],
-            "shuttle_run": [10.2, 9.8],
-            "hand_eye": [15]
+            "sit_reach": [
+                22,
+                24,
+                25
+            ],
+            "sit_up": [
+                18,
+                20
+            ],
+            "long_jump": [
+                160,
+                165
+            ],
+            "sprint_10m": [
+                2.100000000000000088817841970012523233890533447265625
+            ],
+            "shuttle_run": [
+                10.199999999999999289457264239899814128875732421875,
+                9.800000000000000710542735760100185871124267578125
+            ],
+            "hand_eye": [
+                15
+            ]
         }
     },
     {
@@ -23,18 +40,35 @@
         "name": "Aishah Humaira Binti Mohd Yazid",
         "gender": "Perempuan",
         "age": 11,
-        "height": 142.0,
-        "weight": 34.0,
+        "height": 142,
+        "weight": 34,
         "school": "SK Taman Tun Dr Ismail",
         "class": "5 Bestari",
         "created_at": "2026-07-28 12:05:00",
         "scores": {
-            "sit_reach": [32, 34, 35],
-            "sit_up": [14, 15],
-            "long_jump": [120, 125],
-            "sprint_10m": [2.6],
-            "shuttle_run": [12.4, 12.0],
-            "hand_eye": [19]
+            "sit_reach": [
+                32,
+                34,
+                35
+            ],
+            "sit_up": [
+                14,
+                15
+            ],
+            "long_jump": [
+                120,
+                125
+            ],
+            "sprint_10m": [
+                2.600000000000000088817841970012523233890533447265625
+            ],
+            "shuttle_run": [
+                12.4000000000000003552713678800500929355621337890625,
+                12
+            ],
+            "hand_eye": [
+                19
+            ]
         }
     },
     {
@@ -43,17 +77,34 @@
         "gender": "Lelaki",
         "age": 9,
         "height": 128.5,
-        "weight": 33.4,
+        "weight": 33.39999999999999857891452847979962825775146484375,
         "school": "SK Taman Tun Dr Ismail",
         "class": "3 Amanah",
         "created_at": "2026-07-28 12:10:00",
         "scores": {
-            "sit_reach": [12, 14, 15],
-            "sit_up": [8, 9],
-            "long_jump": [98, 102],
-            "sprint_10m": [3.2],
-            "shuttle_run": [14.8, 14.2],
-            "hand_eye": [16]
+            "sit_reach": [
+                12,
+                14,
+                15
+            ],
+            "sit_up": [
+                8,
+                9
+            ],
+            "long_jump": [
+                98,
+                102
+            ],
+            "sprint_10m": [
+                3.20000000000000017763568394002504646778106689453125
+            ],
+            "shuttle_run": [
+                14.800000000000000710542735760100185871124267578125,
+                14.199999999999999289457264239899814128875732421875
+            ],
+            "hand_eye": [
+                16
+            ]
         }
     }
 ]

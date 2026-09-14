@@ -14,6 +14,7 @@ function initApp() {
     setupForms();
     setupSearch();
     setupLoginSystem();
+    setupAdminTeacherRegister();
     loadStudents();
 }
 
@@ -47,6 +48,8 @@ function switchTab(tabId) {
         renderStudentsTable();
     } else if (tabId === 'analytics') {
         renderAnalytics();
+    } else if (tabId === 'teachers') {
+        loadTeachers();
     }
 }
 
@@ -623,9 +626,9 @@ function viewProfile(id) {
             <div class="score-breakdown-item">
                 <div>
                     <div class="score-breakdown-name">${comp.name}</div>
-                    <div style="font-size: 0.75rem; color: var(--text-secondary);">${comp.desc}</div>
+                    <div class="score-breakdown-sub">${comp.desc}</div>
                 </div>
-                <div style="font-size: 0.8rem; color: var(--text-muted);">${trialsStr}</div>
+                <div class="score-breakdown-trials">${trialsStr}</div>
                 <div class="score-breakdown-val">${bestVal !== null ? `${bestVal} ${comp.unit}` : '-'}</div>
                 <div><span class="badge ${evalRes.class}">${evalRes.rating}</span></div>
             </div>
@@ -642,7 +645,7 @@ function viewProfile(id) {
     if (recs.length === 0) {
         sportsContainer.innerHTML = `
             <div class="sport-card" style="justify-content: center;">
-                <div style="text-align: center; color: var(--text-muted); padding: 1rem 0;">
+                <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 1rem 0;">
                     Sila rekodkan sekurang-kurangnya satu skor ujian fizikal untuk menerima cadangan bidang sukan.
                 </div>
             </div>
@@ -655,9 +658,12 @@ function viewProfile(id) {
                         <i class="${rec.icon}"></i>
                     </div>
                     <div class="sport-info">
-                        <h4>${rec.name} <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: 0.5rem;">(${rec.percentage}%)</span></h4>
-                        <p style="margin-bottom: 0.25rem;">${rec.category} &bull; Kesesuaian: <strong>${rec.level}</strong></p>
-                        <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.3;">${rec.desc}</p>
+                        <div class="sport-info-top">
+                            <h4>${rec.name}</h4>
+                            <span class="sport-match-badge">${rec.percentage}%</span>
+                        </div>
+                        <p class="sport-meta">${rec.category} &bull; Kesesuaian: <strong>${rec.level}</strong></p>
+                        <p class="sport-desc">${rec.desc}</p>
                     </div>
                 </div>
             `;
@@ -665,20 +671,30 @@ function viewProfile(id) {
         });
     }
 
-    // Kemas kini Carta Radar
-    renderRadarChart(radarLabels, radarData);
-
     switchTab('profile');
+
+    // Kemas kini Carta Radar selepas tab dipaparkan supaya kanvas mempunyai saiz tepat
+    setTimeout(() => {
+        renderRadarChart(radarLabels, radarData);
+    }, 60);
 }
 
 // Bina / Kemas kini Radar Chart Murid
 function renderRadarChart(labels, data) {
-    const ctx = document.getElementById('fitnessRadarChart').getContext('2d');
-    
+    const canvas = document.getElementById('fitnessRadarChart');
+    if (!canvas) return;
+
     if (charts.radar) {
-        charts.radar.destroy();
+        try {
+            charts.radar.destroy();
+        } catch (e) {
+            console.warn('Destroy chart error:', e);
+        }
+        charts.radar = null;
     }
 
+    const ctx = canvas.getContext('2d');
+    
     charts.radar = new Chart(ctx, {
         type: 'radar',
         data: {
@@ -686,40 +702,52 @@ function renderRadarChart(labels, data) {
             datasets: [{
                 label: 'Mata Prestasi (1-5)',
                 data: data,
-                backgroundColor: 'rgba(0, 242, 254, 0.2)',
-                borderColor: 'rgba(0, 242, 254, 0.8)',
+                backgroundColor: 'rgba(0, 242, 254, 0.22)',
+                borderColor: 'rgba(0, 242, 254, 0.9)',
                 pointBackgroundColor: 'rgba(139, 92, 246, 1)',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
+                pointBorderColor: '#ffffff',
+                pointHoverBackgroundColor: '#ffffff',
                 pointHoverBorderColor: 'rgba(0, 242, 254, 1)',
-                borderWidth: 2
+                borderWidth: 2.5,
+                pointRadius: 4,
+                pointHoverRadius: 6
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: {
+                duration: 400
+            },
+            layout: {
+                padding: { top: 8, bottom: 8, left: 8, right: 8 }
+            },
             plugins: {
                 legend: { display: false }
             },
             scales: {
                 r: {
-                    angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    angleLines: { color: 'rgba(255, 255, 255, 0.15)' },
+                    grid: { color: 'rgba(255, 255, 255, 0.12)' },
                     pointLabels: {
                         color: '#9aa8e3',
-                        font: { size: 11, family: 'Outfit' }
+                        font: { size: 10.5, family: 'Outfit', weight: '600' },
+                        padding: 6
                     },
                     ticks: {
                         backdropColor: 'transparent',
                         color: '#64748b',
                         stepSize: 1,
                         min: 0,
-                        max: 5
+                        max: 5,
+                        font: { size: 9 }
                     }
                 }
             }
         }
     });
+
+    charts.studentRadar = charts.radar;
 }
 
 // Render Jadual Utama Atlet
@@ -1080,35 +1108,53 @@ function renderAnalytics() {
 // ==========================================
 
 function setupLoginSystem() {
-    // 1. Dapatkan semua kad peranan
     const roleCards = document.querySelectorAll('.role-card');
     const loginForm = document.getElementById('login-form');
+    const teacherRegisterForm = document.getElementById('teacher-register-form');
     const hiddenRoleInput = document.getElementById('login-selected-role');
-    const passcodeGroup = document.getElementById('login-passcode').parentElement;
+    const usernameGroup = document.getElementById('login-username-group');
+    const passcodeGroup = document.getElementById('login-passcode-group');
+    const registerLinkContainer = document.getElementById('register-teacher-link-container');
     const errorMsg = document.getElementById('login-error-msg');
 
     roleCards.forEach(card => {
         card.addEventListener('click', () => {
-            // Bersihkan pilihan lama
             roleCards.forEach(c => c.classList.remove('selected'));
             errorMsg.style.display = 'none';
             document.getElementById('login-passcode').value = '';
+            if (document.getElementById('login-username')) {
+                document.getElementById('login-username').value = '';
+            }
 
-            // Set kad dipilih
             card.classList.add('selected');
             const role = card.getAttribute('data-role');
             hiddenRoleInput.value = role;
 
-            // Buka borang log masuk
             loginForm.style.display = 'block';
+            teacherRegisterForm.style.display = 'none';
 
             if (role === 'Anak Murid') {
                 passcodeGroup.style.display = 'none';
                 document.getElementById('login-passcode').removeAttribute('required');
+                usernameGroup.style.display = 'none';
+                document.getElementById('login-username').removeAttribute('required');
+                registerLinkContainer.style.display = 'none';
+            } else if (role === 'Cikgu') {
+                passcodeGroup.style.display = 'block';
+                document.getElementById('login-passcode').setAttribute('required', 'required');
+                document.getElementById('passcode-label').innerText = 'Kata Laluan';
+                
+                usernameGroup.style.display = 'block';
+                document.getElementById('login-username').setAttribute('required', 'required');
+                registerLinkContainer.style.display = 'block';
             } else {
                 passcodeGroup.style.display = 'block';
                 document.getElementById('login-passcode').setAttribute('required', 'required');
-                document.getElementById('passcode-label').innerText = `Kata Laluan ${role}`;
+                document.getElementById('passcode-label').innerText = 'Kata Laluan Admin';
+                
+                usernameGroup.style.display = 'none';
+                document.getElementById('login-username').removeAttribute('required');
+                registerLinkContainer.style.display = 'none';
             }
         });
     });
@@ -1121,30 +1167,123 @@ function setupLoginSystem() {
             roleCards.forEach(c => c.classList.remove('selected'));
             hiddenRoleInput.value = '';
             errorMsg.style.display = 'none';
+            usernameGroup.style.display = 'none';
+            registerLinkContainer.style.display = 'none';
+        });
+    }
+
+    // Toggle ke pendaftaran guru
+    const showRegisterBtn = document.getElementById('btn-show-teacher-register');
+    if (showRegisterBtn) {
+        showRegisterBtn.addEventListener('click', () => {
+            loginForm.style.display = 'none';
+            teacherRegisterForm.style.display = 'block';
+            
+            document.getElementById('reg-t-name').value = '';
+            document.getElementById('reg-t-username').value = '';
+            document.getElementById('reg-t-phone').value = '';
+            document.getElementById('reg-t-passcode').value = '';
+            document.getElementById('reg-t-error-msg').style.display = 'none';
+            document.getElementById('reg-t-success-msg').style.display = 'none';
+        });
+    }
+
+    // Button kembali pendaftaran guru
+    const regBackBtn = document.getElementById('btn-reg-t-back');
+    if (regBackBtn) {
+        regBackBtn.addEventListener('click', () => {
+            teacherRegisterForm.style.display = 'none';
+            loginForm.style.display = 'block';
+        });
+    }
+
+    // Submit pendaftaran guru awam
+    if (teacherRegisterForm) {
+        teacherRegisterForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('reg-t-name').value;
+            const username = document.getElementById('reg-t-username').value;
+            const phone = document.getElementById('reg-t-phone').value;
+            const school = document.getElementById('reg-t-school').value;
+            const passcode = document.getElementById('reg-t-passcode').value;
+
+            const errorAlert = document.getElementById('reg-t-error-msg');
+            const successAlert = document.getElementById('reg-t-success-msg');
+
+            errorAlert.style.display = 'none';
+            successAlert.style.display = 'none';
+
+            try {
+                const response = await fetch('api.php?action=register_teacher', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, username, phone, school, passcode })
+                });
+
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    successAlert.style.display = 'block';
+                    setTimeout(() => {
+                        teacherRegisterForm.style.display = 'none';
+                        loginForm.style.display = 'block';
+                        document.getElementById('login-username').value = username;
+                        document.getElementById('login-passcode').focus();
+                    }, 1500);
+                } else {
+                    errorAlert.innerText = result.error || 'Gagal mendaftar guru.';
+                    errorAlert.style.display = 'block';
+                }
+            } catch (err) {
+                errorAlert.innerText = 'Ralat rangkaian. Sila cuba lagi.';
+                errorAlert.style.display = 'block';
+            }
         });
     }
 
     // Submit form log masuk
     if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const role = hiddenRoleInput.value;
             const passcode = document.getElementById('login-passcode').value;
+            const errorMsg = document.getElementById('login-error-msg');
+            errorMsg.style.display = 'none';
 
-            let isCorrect = false;
-            if (role === 'Admin' && passcode === 'admin123') {
-                isCorrect = true;
-            } else if (role === 'Cikgu' && passcode === 'cikgu123') {
-                isCorrect = true;
-            } else if (role === 'Anak Murid') {
-                isCorrect = true;
+            if (role === 'Anak Murid') {
+                loginUser(role);
+                return;
             }
 
-            if (isCorrect) {
-                errorMsg.style.display = 'none';
-                loginUser(role);
-            } else {
-                errorMsg.style.display = 'block';
+            if (role === 'Admin') {
+                if (passcode === 'admin123') {
+                    loginUser(role);
+                } else {
+                    errorMsg.style.display = 'block';
+                    errorMsg.innerText = 'Kata laluan salah. Sila cuba lagi.';
+                }
+                return;
+            }
+
+            if (role === 'Cikgu') {
+                const username = document.getElementById('login-username').value;
+                try {
+                    const response = await fetch('api.php?action=login_teacher', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, passcode })
+                    });
+                    const result = await response.json();
+                    if (response.ok && result.success) {
+                        sessionStorage.setItem('tid_teacher_name', result.teacher.name);
+                        loginUser(role);
+                    } else {
+                        errorMsg.innerText = result.error || 'Kata laluan atau ID salah.';
+                        errorMsg.style.display = 'block';
+                    }
+                } catch (err) {
+                    errorMsg.innerText = 'Ralat rangkaian. Sila cuba lagi.';
+                    errorMsg.style.display = 'block';
+                }
             }
         });
     }
@@ -1177,18 +1316,30 @@ function loginUser(role) {
 function handleLogout() {
     sessionStorage.removeItem('tid_logged_in');
     sessionStorage.removeItem('tid_current_role');
+    sessionStorage.removeItem('tid_teacher_name');
     document.body.classList.remove('logged-in', 'role-admin', 'role-cikgu', 'role-student', 'student-portal-active');
     
-    // Reset paparan log masuk
     const loginForm = document.getElementById('login-form');
     if (loginForm) loginForm.style.display = 'none';
+    const teacherRegisterForm = document.getElementById('teacher-register-form');
+    if (teacherRegisterForm) teacherRegisterForm.style.display = 'none';
     document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
     const hiddenRoleInput = document.getElementById('login-selected-role');
     if (hiddenRoleInput) hiddenRoleInput.value = '';
+    const usernameField = document.getElementById('login-username');
+    if (usernameField) {
+        usernameField.value = '';
+        usernameField.parentElement.style.display = 'none';
+    }
     const passcodeField = document.getElementById('login-passcode');
     if (passcodeField) passcodeField.value = '';
+    const registerLinkContainer = document.getElementById('register-teacher-link-container');
+    if (registerLinkContainer) registerLinkContainer.style.display = 'none';
     const errorMsg = document.getElementById('login-error-msg');
-    if (errorMsg) errorMsg.style.display = 'none';
+    if (errorMsg) {
+        errorMsg.style.display = 'none';
+        errorMsg.innerText = 'Kata laluan salah. Sila cuba lagi.';
+    }
 }
 
 function checkSession() {
@@ -1249,14 +1400,16 @@ function showStudentPortalReport(id) {
     const student = students.find(s => s.id === id);
     if (!student) return;
 
+    selectedStudentId = id;
+
     const container = document.getElementById('student-portal-report-container');
     container.style.display = 'block';
 
     const bmiResult = calculateBMI(student.weight, student.height);
     
-    // Lukis antaramuka profil secara dinamik
+    // Lukis antaramuka profil secara dinamik (Format Asal)
     container.innerHTML = `
-        <div class="profile-grid" style="margin-top: 2rem;">
+        <div class="profile-grid" style="margin-top: 1.5rem;">
             <!-- Left Sidebar Profile -->
             <div class="card profile-sidebar-card">
                 <div class="avatar-container">
@@ -1291,16 +1444,16 @@ function showStudentPortalReport(id) {
                 <div class="visuals-grid">
                     <!-- Radar Chart -->
                     <div class="card chart-card">
-                        <h3 style="margin-bottom: 1rem;"><i class="fa-solid fa-chart-radar" style="color: var(--accent-primary); margin-right: 0.5rem;"></i>Profil Kecergasan Saya</h3>
+                        <h3 style="margin-bottom: 1rem;"><i class="fa-solid fa-chart-radar" style="color: var(--accent-primary); margin-right: 0.5rem;"></i>Profil Kecergasan Atlet</h3>
                         <div class="chart-container">
                             <canvas id="studentPortalRadarChart"></canvas>
                         </div>
                     </div>
                     
                     <!-- Sports Recommendation Card -->
-                    <div class="card" style="display: flex; flex-direction: column;">
+                    <div class="card sports-card-wrapper">
                         <h3><i class="fa-solid fa-trophy" style="color: var(--accent-primary); margin-right: 0.5rem;"></i>Cadangan Bidang Sukan</h3>
-                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">Berdasarkan ujian kecergasan fizikal terbaik yang direkodkan:</p>
+                        <p class="sports-subtitle">Berdasarkan ujian kecergasan fizikal terbaik yang direkodkan:</p>
                         <div class="sports-container" id="student-portal-sports-list">
                             <!-- Dynamic sports loaded here -->
                         </div>
@@ -1308,7 +1461,7 @@ function showStudentPortalReport(id) {
                 </div>
 
                 <!-- Score Breakdowns -->
-                <div class="card">
+                <div class="card score-breakdown-card">
                     <h3 style="margin-bottom: 1.25rem;"><i class="fa-solid fa-list-check" style="color: var(--accent-primary); margin-right: 0.5rem;"></i>Perincian Skor & Analisis Komponen</h3>
                     <div class="score-breakdown-list" id="student-portal-score-breakdown">
                         <!-- Dynamic component details -->
@@ -1354,9 +1507,9 @@ function showStudentPortalReport(id) {
             <div class="score-breakdown-item">
                 <div>
                     <div class="score-breakdown-name">${comp.name}</div>
-                    <div style="font-size: 0.75rem; color: var(--text-secondary);">${comp.desc}</div>
+                    <div class="score-breakdown-sub">${comp.desc}</div>
                 </div>
-                <div style="font-size: 0.8rem; color: var(--text-muted);">${trialsStr}</div>
+                <div class="score-breakdown-trials">${trialsStr}</div>
                 <div class="score-breakdown-val">${bestVal !== null ? `${bestVal} ${comp.unit}` : '-'}</div>
                 <div><span class="badge ${evalRes.class}">${evalRes.rating}</span></div>
             </div>
@@ -1371,7 +1524,7 @@ function showStudentPortalReport(id) {
     if (recs.length === 0) {
         sportsContainer.innerHTML = `
             <div class="sport-card" style="justify-content: center;">
-                <div style="text-align: center; color: var(--text-muted); padding: 1rem 0;">
+                <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 1rem 0;">
                     Ujian kecergasan fizikal anda belum lengkap sepenuhnya. Sila hubungi cikgu.
                 </div>
             </div>
@@ -1384,9 +1537,12 @@ function showStudentPortalReport(id) {
                         <i class="${rec.icon}"></i>
                     </div>
                     <div class="sport-info">
-                        <h4>${rec.name} <span style="font-size: 0.8rem; color: var(--text-muted); margin-left: 0.5rem;">(${rec.percentage}%)</span></h4>
-                        <p style="margin-bottom: 0.25rem;">${rec.category} &bull; Kesesuaian: <strong>${rec.level}</strong></p>
-                        <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.3;">${rec.desc}</p>
+                        <div class="sport-info-top">
+                            <h4>${rec.name}</h4>
+                            <span class="sport-match-badge">${rec.percentage}%</span>
+                        </div>
+                        <p class="sport-meta">${rec.category} &bull; Kesesuaian: <strong>${rec.level}</strong></p>
+                        <p class="sport-desc">${rec.desc}</p>
                     </div>
                 </div>
             `;
@@ -1397,211 +1553,677 @@ function showStudentPortalReport(id) {
     // 3. Render radar chart portal murid
     setTimeout(() => {
         renderStudentPortalRadarChart(radarLabels, radarData);
-    }, 100);
+    }, 80);
 }
 
 function renderStudentPortalRadarChart(labels, data) {
-    const ctx = document.getElementById('studentPortalRadarChart');
-    if (!ctx) return;
+    const canvas = document.getElementById('studentPortalRadarChart');
+    if (!canvas) return;
     
     if (charts.studentRadar) {
-        charts.studentRadar.destroy();
+        try {
+            charts.studentRadar.destroy();
+        } catch (e) {
+            console.warn('Destroy student radar error:', e);
+        }
+        charts.studentRadar = null;
     }
 
-    charts.studentRadar = new Chart(ctx.getContext('2d'), {
+    const ctx = canvas.getContext('2d');
+
+    charts.studentRadar = new Chart(ctx, {
         type: 'radar',
         data: {
             labels: labels,
             datasets: [{
                 label: 'Mata Prestasi (1-5)',
                 data: data,
-                backgroundColor: 'rgba(0, 242, 254, 0.2)',
-                borderColor: 'rgba(0, 242, 254, 0.8)',
+                backgroundColor: 'rgba(0, 242, 254, 0.22)',
+                borderColor: 'rgba(0, 242, 254, 0.9)',
                 pointBackgroundColor: 'rgba(139, 92, 246, 1)',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
+                pointBorderColor: '#ffffff',
+                pointHoverBackgroundColor: '#ffffff',
                 pointHoverBorderColor: 'rgba(0, 242, 254, 1)',
-                borderWidth: 2
+                borderWidth: 2.5,
+                pointRadius: 4,
+                pointHoverRadius: 6
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: {
+                duration: 400
+            },
+            layout: {
+                padding: { top: 8, bottom: 8, left: 8, right: 8 }
+            },
             plugins: {
                 legend: { display: false }
             },
             scales: {
                 r: {
-                    angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                    angleLines: { color: 'rgba(255, 255, 255, 0.15)' },
+                    grid: { color: 'rgba(255, 255, 255, 0.12)' },
                     pointLabels: {
                         color: '#9aa8e3',
-                        font: { size: 11, family: 'Outfit' }
+                        font: { size: 10.5, family: 'Outfit', weight: '600' },
+                        padding: 6
                     },
                     ticks: {
                         backdropColor: 'transparent',
                         color: '#64748b',
                         stepSize: 1,
                         min: 0,
-                        max: 5
+                        max: 5,
+                        font: { size: 9 }
                     }
                 }
             }
         }
     });
+
+    charts.radar = charts.studentRadar;
 }
 
-// --- FUNGSI MUAT TURUN PDF (TID ANALYST) ---
-function downloadPDF(elementId, studentName, buttonId) {
-    const originalElement = document.getElementById(elementId);
-    if (!originalElement) {
-        console.error('Element not found:', elementId);
-        return;
-    }
-
+// --- FUNGSI MUAT TURUN PDF (TID ANALYST) - FORMAT TEPAT 2 MUKA SURAT ---
+async function downloadPDF(elementId, studentName, buttonId, targetStudent) {
     const btn = document.getElementById(buttonId);
     const originalText = btn ? btn.innerHTML : '';
     if (btn) {
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menjana PDF...';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menjana PDF 2 Muka Surat...';
     }
 
-    // Buat salinan (clone) untuk dipaparkan secara berasingan bagi cetakan PDF
-    const element = originalElement.cloneNode(true);
-    
-    // Salin data lukisan (bitmap) daripada kanvas asal ke kanvas salinan
-    const originalCanvases = originalElement.querySelectorAll('canvas');
-    const clonedCanvases = element.querySelectorAll('canvas');
-    
-    for (let i = 0; i < originalCanvases.length; i++) {
-        const sourceCanvas = originalCanvases[i];
-        const destCanvas = clonedCanvases[i];
-        if (sourceCanvas && destCanvas) {
-            destCanvas.width = sourceCanvas.width;
-            destCanvas.height = sourceCanvas.height;
-            const destCtx = destCanvas.getContext('2d');
-            destCtx.drawImage(sourceCanvas, 0, 0);
+    if (typeof html2pdf === 'undefined') {
+        alert('Pustaka html2pdf belum dimuatkan sepenuhnya. Sila semak sambungan internet anda atau gunakan butang "Cetak Laporan".');
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+        return;
+    }
+
+    // Dapatkan data murid
+    let student = targetStudent || students.find(s => s.id === selectedStudentId);
+    if (!student && studentName) {
+        student = students.find(s => s.name.trim().toLowerCase() === studentName.trim().toLowerCase());
+    }
+    if (!student && students.length > 0) {
+        student = students[0];
+    }
+
+    if (!student) {
+        alert('Data murid tidak ditemui untuk muat turun.');
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+        return;
+    }
+
+    // Pengiraan data analisis
+    const bmiResult = calculateBMI(student.weight, student.height);
+    const overallFitness = calculateOverallFitness(student);
+    const recs = getSportRecommendations(student);
+    const sc = student.scores || {};
+
+    const components = [
+        { key: 'sit_reach', name: 'Sit & Reach (Kelenturan)', short: 'Sit & Reach', cat: 'Kelenturan Sendi Belakang & Peha', unit: 'cm' },
+        { key: 'sit_up', name: '30s Sit-Up (Daya Tahan)', short: 'Sit-Up', cat: 'Kekuatan Otot Teras Abdomen', unit: 'kali' },
+        { key: 'long_jump', name: 'Standing Long Jump (Kuasa)', short: 'Long Jump', cat: 'Kuasa Letupan Otot Kaki', unit: 'cm' },
+        { key: 'sprint_10m', name: '10m Sprint (Kelajuan)', short: '10m Sprint', cat: 'Kelajuan Pecutan Jarak Dekat', unit: 'saat' },
+        { key: 'shuttle_run', name: '10m Shuttle Run (Ketangkasan)', short: 'Shuttle Run', cat: 'Ketangkasan & Kecekapan Arah', unit: 'saat' },
+        { key: 'hand_eye', name: 'Hand-Eye Coordination (Koordinasi)', short: 'Hand-Eye', cat: 'Koordinasi Motor Mata-Tangan', unit: 'tangkapan' }
+    ];
+
+    const evaluatedComponents = components.map(c => {
+        const trials = sc[c.key] || [];
+        const best = calculateBestScore(c.key, trials);
+        const evalRes = evaluateFitnessComponent(c.key, best, student.gender, student.age);
+        let trialsStr = trials
+            .map((v, i) => v !== null && v !== '' ? `C${i+1}: ${v}${c.unit}` : null)
+            .filter(v => v !== null)
+            .join(', ');
+        if (!trialsStr) trialsStr = 'Tiada data';
+        return { ...c, trialsStr, best, evalRes };
+    });
+
+    const bestComponents = evaluatedComponents
+        .filter(c => c.best !== null && c.evalRes.score >= 4)
+        .map(c => c.name.split(' (')[0]);
+    const strengthsText = bestComponents.length > 0 
+        ? `Komponen kekuatan utama murid dikenal pasti dalam <strong>${bestComponents.join(', ')}</strong>.` 
+        : 'Prestasi kecergasan murid berada pada tahap yang seimbang merentasi ujian asas.';
+
+    const formattedDate = new Date().toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    // Dapatkan imej Carta Radar
+    let chartDataUrl = '';
+    if (charts.studentRadar && typeof charts.studentRadar.toBase64Image === 'function') {
+        try {
+            chartDataUrl = charts.studentRadar.toBase64Image();
+        } catch (e) {
+            console.warn('Gagal toBase64Image dari charts.studentRadar:', e);
         }
     }
-    
-    // Tetapkan gaya kedudukan klon di luar skrin dengan lebar desktop tetap agar responsif
-    element.style.position = 'absolute';
-    element.style.left = '-9999px';
-    element.style.top = '0';
-    element.style.width = '1024px';
-    element.style.background = '#060919';
-    element.style.color = '#ffffff';
-    element.style.padding = '30px';
-    element.style.borderRadius = '16px';
-    element.style.boxSizing = 'border-box';
-    document.body.appendChild(element);
+    if (!chartDataUrl) {
+        const originalElement = document.getElementById(elementId);
+        let chartCanvas = originalElement ? originalElement.querySelector('canvas') : null;
+        if (!chartCanvas) {
+            chartCanvas = document.getElementById('fitnessRadarChart') || document.getElementById('studentPortalRadarChart');
+        }
+        if (chartCanvas && chartCanvas.width > 0 && chartCanvas.height > 0) {
+            try {
+                chartDataUrl = chartCanvas.toDataURL('image/png', 1.0);
+            } catch (e) {
+                console.warn('Gagal menukar canvas ke dataURL:', e);
+            }
+        }
+    }
 
-    // Paksa paparan skrin asal (langkau gaya media print CSS yang menyembunyikan carta/avatar)
-    const grids = element.querySelectorAll('.profile-grid');
-    grids.forEach(grid => {
-        grid.style.setProperty('display', 'grid', 'important');
-        grid.style.setProperty('grid-template-columns', '320px 1fr', 'important');
-        grid.style.setProperty('gap', '2rem', 'important');
-    });
+    // Penjana SVG Carta Radar Vektor jika imej bitmap canvas tiada
+    function generateRadarSvgHtml() {
+        const cx = 135, cy = 120, r = 75;
+        const angles = [-Math.PI/2, -Math.PI/6, Math.PI/6, Math.PI/2, 5*Math.PI/6, -5*Math.PI/6];
+        
+        let gridLines = '';
+        for (let lvl = 1; lvl <= 5; lvl++) {
+            const lr = (lvl / 5) * r;
+            const pts = angles.map(a => `${(cx + lr * Math.cos(a)).toFixed(1)},${(cy + lr * Math.sin(a)).toFixed(1)}`).join(' ');
+            gridLines += `<polygon points="${pts}" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1" />`;
+        }
 
-    const chartCards = element.querySelectorAll('.chart-card');
-    chartCards.forEach(card => {
-        card.style.setProperty('display', 'block', 'important');
-    });
+        let axes = '';
+        angles.forEach(a => {
+            const x2 = (cx + r * Math.cos(a)).toFixed(1);
+            const y2 = (cy + r * Math.sin(a)).toFixed(1);
+            axes += `<line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="rgba(255,255,255,0.15)" stroke-width="1" />`;
+        });
 
-    const sidebars = element.querySelectorAll('.profile-sidebar-card');
-    sidebars.forEach(sidebar => {
-        sidebar.style.setProperty('display', 'flex', 'important');
-        sidebar.style.setProperty('flex-direction', 'column', 'important');
-        sidebar.style.setProperty('text-align', 'center', 'important');
-        sidebar.style.setProperty('align-items', 'center', 'important');
-        sidebar.style.setProperty('border-bottom', 'none', 'important');
-        sidebar.style.setProperty('background', 'rgba(18, 26, 60, 0.4)', 'important');
-        sidebar.style.setProperty('border', '1px solid rgba(255, 255, 255, 0.1)', 'important');
-        sidebar.style.setProperty('color', '#ffffff', 'important');
-    });
+        const dataPts = evaluatedComponents.map((c, i) => {
+            const score = c.evalRes && c.evalRes.score ? Math.max(1, Math.min(5, c.evalRes.score)) : 2;
+            const dr = (score / 5) * r;
+            return `${(cx + dr * Math.cos(angles[i])).toFixed(1)},${(cy + dr * Math.sin(angles[i])).toFixed(1)}`;
+        }).join(' ');
 
-    const avatars = element.querySelectorAll('.avatar-container');
-    avatars.forEach(avatar => {
-        avatar.style.setProperty('display', 'block', 'important');
-    });
+        let ptsDots = '';
+        evaluatedComponents.forEach((c, i) => {
+            const score = c.evalRes && c.evalRes.score ? Math.max(1, Math.min(5, c.evalRes.score)) : 2;
+            const dr = (score / 5) * r;
+            const px = (cx + dr * Math.cos(angles[i])).toFixed(1);
+            const py = (cy + dr * Math.sin(angles[i])).toFixed(1);
+            ptsDots += `<circle cx="${px}" cy="${py}" r="3.5" fill="#8b5cf6" stroke="#ffffff" stroke-width="1.5" />`;
+        });
 
-    const visualsGrids = element.querySelectorAll('.visuals-grid');
-    visualsGrids.forEach(vg => {
-        vg.style.setProperty('display', 'grid', 'important');
-        vg.style.setProperty('grid-template-columns', 'repeat(auto-fit, minmax(320px, 1fr))', 'important');
-        vg.style.setProperty('gap', '2rem', 'important');
-    });
+        let labels = '';
+        angles.forEach((a, i) => {
+            const lr = r + 18;
+            const lx = (cx + lr * Math.cos(a)).toFixed(1);
+            const ly = (cy + lr * Math.sin(a) + 3).toFixed(1);
+            const align = Math.abs(Math.cos(a)) < 0.25 ? 'middle' : (Math.cos(a) > 0 ? 'start' : 'end');
+            labels += `<text x="${lx}" y="${ly}" fill="#9aa8e3" font-size="8" font-family="'Outfit', sans-serif" text-anchor="${align}">${components[i].short}</text>`;
+        });
 
-    // Padam butang tindakan dalam salinan PDF
-    const actionsToHide = element.querySelectorAll('button, .btn');
-    actionsToHide.forEach(el => el.remove());
+        return `
+            <svg width="270" height="240" viewBox="0 0 270 240" style="display: block; margin: 0 auto;">
+                ${gridLines}
+                ${axes}
+                <polygon points="${dataPts}" fill="rgba(0, 242, 254, 0.25)" stroke="#00f2fe" stroke-width="2" />
+                ${ptsDots}
+                ${labels}
+            </svg>
+        `;
+    }
 
-    // Rekah banner kepala laporan (header)
-    const headerBanner = document.createElement('div');
-    headerBanner.style.borderBottom = '2px solid rgba(0, 242, 254, 0.2)';
-    headerBanner.style.paddingBottom = '15px';
-    headerBanner.style.marginBottom = '25px';
-    headerBanner.style.display = 'flex';
-    headerBanner.style.justifyContent = 'space-between';
-    headerBanner.style.alignItems = 'center';
-    headerBanner.style.fontFamily = "'Outfit', sans-serif";
-    
-    headerBanner.innerHTML = `
-        <div>
-            <h1 style="color: #fff; font-size: 24px; margin: 0; font-weight: 700;">Laporan Prestasi & Analisis TID</h1>
-            <p style="color: #9aa8e3; font-size: 13px; margin: 5px 0 0 0;">Sistem Analisis Talent Identification Sekolah Rendah</p>
+    const sportEmojis = {
+        'Olahraga': '🏃',
+        'Olahraga / Balapan': '🏃',
+        'Olahraga (Balapan & Padang)': '🏃',
+        'Bola Sepak': '⚽',
+        'Sepak Takraw': '🏐',
+        'Bola Jaring': '🏀',
+        'Bola Tampar': '🏐',
+        'Badminton': '🏸',
+        'Gimnastik': '🤸',
+        'Renang': '🏊',
+        'Hoki': '🏑',
+        'Skuasy': '🎾',
+        'Tenis': '🎾',
+        'Memanah': '🏹'
+    };
+
+    // Bina dokumen khas 2 muka surat dengan dimensi A4 piawai (794px x 1122px)
+    // PENTING: Gunakan position: fixed; left: 0; top: 0; z-index: -99999;
+    // Ini memastikan koordinat DOM berada tepat di dalam viewport tangkapan html2canvas
+    // tanpa berada di luar skrin (-9999px) yang menyebabkan PDF menjadi kosong / tiada apa terpapar.
+    const pdfWrapper = document.createElement('div');
+    pdfWrapper.id = 'pdf-2pages-container';
+    pdfWrapper.style.position = 'fixed';
+    pdfWrapper.style.left = '0';
+    pdfWrapper.style.top = '0';
+    pdfWrapper.style.width = '794px';
+    pdfWrapper.style.zIndex = '-99999';
+    pdfWrapper.style.opacity = '1';
+    pdfWrapper.style.pointerEvents = 'none';
+    pdfWrapper.style.background = '#060919';
+    pdfWrapper.style.color = '#ffffff';
+    pdfWrapper.style.fontFamily = "'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+    pdfWrapper.style.boxSizing = 'border-box';
+    pdfWrapper.style.overflow = 'visible';
+
+    pdfWrapper.innerHTML = `
+        <!-- ================= MUKA SURAT 1 ================= -->
+        <div class="pdf-page-1" style="width: 794px; height: 1122px; box-sizing: border-box; padding: 24px 28px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; background: #060919;">
+            <!-- Header Banner -->
+            <div style="border-bottom: 2px solid rgba(0, 242, 254, 0.3); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); display: flex; align-items: center; justify-content: center; color: #060919; font-size: 18px; font-weight: 900;">
+                        TID
+                    </div>
+                    <div>
+                        <h1 style="font-size: 17px; margin: 0; font-weight: 700; color: #ffffff; letter-spacing: -0.3px;">LAPORAN PROFIL PRESTASI & BAKAT SUKAN (TID)</h1>
+                        <p style="font-size: 10px; color: #9aa8e3; margin: 2px 0 0 0;">Program Pembangunan Bakat Sukan Sekolah Rendah &bull; Kementerian Pendidikan Malaysia</p>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <span style="color: #00f2fe; font-weight: 700; font-size: 14px; letter-spacing: 0.5px;">TID ANALYST</span>
+                    <p style="color: #64748b; font-size: 9.5px; margin: 2px 0 0 0;">Tarikh: ${formattedDate}</p>
+                </div>
+            </div>
+
+            <!-- Maklumat Atlet & Metrik Fizikal (Horizontal Banner Card) -->
+            <div style="background: rgba(18, 26, 60, 0.6); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 12px 16px; display: grid; grid-template-columns: 1.15fr 1fr; gap: 14px; align-items: center;">
+                <!-- Kiri: Maklumat Peribadi -->
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #8b5cf6); padding: 2px; flex-shrink: 0;">
+                        <div style="width: 100%; height: 100%; border-radius: 50%; background: #060919; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: #fff;">
+                            ${student.name.charAt(0).toUpperCase()}
+                        </div>
+                    </div>
+                    <div>
+                        <h2 style="font-size: 15px; font-weight: 700; color: #ffffff; margin: 0 0 3px 0;">${student.name}</h2>
+                        <div style="font-size: 10.5px; color: #9aa8e3; display: flex; align-items: center; gap: 6px;">
+                            <span style="background: ${student.gender === 'Lelaki' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(236, 72, 153, 0.2)'}; color: ${student.gender === 'Lelaki' ? '#60a5fa' : '#f472b6'}; padding: 1px 6px; border-radius: 4px; font-weight: 600;">${student.gender}</span>
+                            <span>&bull; ${student.age} Tahun</span>
+                            <span>&bull; Kelas: ${student.class}</span>
+                        </div>
+                        <p style="font-size: 10px; color: #64748b; margin: 2px 0 0 0;">${student.school || 'SK Taman Tun Dr Ismail'}</p>
+                    </div>
+                </div>
+                <!-- Kanan: Metrik Kesihatan & Fizikal -->
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center;">
+                    <div style="background: rgba(0,0,0,0.25); padding: 6px 4px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+                        <div style="font-size: 8.5px; color: #9aa8e3; text-transform: uppercase;">Tinggi</div>
+                        <div style="font-size: 12.5px; font-weight: 700; color: #fff; margin-top: 1px;">${student.height ? `${student.height} cm` : '-'}</div>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.25); padding: 6px 4px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+                        <div style="font-size: 8.5px; color: #9aa8e3; text-transform: uppercase;">Berat</div>
+                        <div style="font-size: 12.5px; font-weight: 700; color: #fff; margin-top: 1px;">${student.weight ? `${student.weight} kg` : '-'}</div>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.25); padding: 6px 4px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+                        <div style="font-size: 8.5px; color: #9aa8e3; text-transform: uppercase;">BMI</div>
+                        <div style="font-size: 12.5px; font-weight: 700; color: #00f2fe; margin-top: 1px;">${bmiResult.bmi || '-'}</div>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.25); padding: 6px 4px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+                        <div style="font-size: 8.5px; color: #9aa8e3; text-transform: uppercase;">Status</div>
+                        <div style="font-size: 10px; font-weight: 700; color: #34d399; margin-top: 2px;">${bmiResult.status || 'Normal'}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analisis Prestasi: Radar Chart (Kiri) & Cadangan Sukan (Kanan) -->
+            <div style="display: grid; grid-template-columns: 1fr 1.08fr; gap: 14px;">
+                <!-- Radar Chart -->
+                <div style="background: rgba(18, 26, 60, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                            <h3 style="font-size: 12px; font-weight: 700; color: #fff; margin: 0;">Profil Radar Kecergasan Atlet</h3>
+                            <span style="font-size: 9px; color: #00f2fe; background: rgba(0,242,254,0.1); padding: 1px 6px; border-radius: 4px;">Skala 1 - 5</span>
+                        </div>
+                        <p style="font-size: 9px; color: #9aa8e3; margin: 0 0 4px 0;">Berasaskan 6 komponen ujian kecergasan fizikal bateri TID</p>
+                    </div>
+                    <div style="text-align: center; height: 245px; display: flex; align-items: center; justify-content: center;">
+                        ${chartDataUrl 
+                            ? `<img src="${chartDataUrl}" style="max-width: 100%; max-height: 240px; object-fit: contain;">` 
+                            : generateRadarSvgHtml()
+                        }
+                    </div>
+                    <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 4px; font-size: 8.5px; color: #64748b; text-align: center;">
+                        Mata 5 = Cemerlang | Mata 4 = Baik | Mata 3 = Sederhana | Mata 1-2 = Perlu Latihan
+                    </div>
+                </div>
+
+                <!-- Cadangan Bidang Sukan -->
+                <div style="background: rgba(18, 26, 60, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 12px; display: flex; flex-direction: column;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                        <h3 style="font-size: 12px; font-weight: 700; color: #fff; margin: 0;">Cadangan 3 Bidang Sukan Terbaik</h3>
+                        <span style="font-size: 9px; color: #34d399; background: rgba(16,185,129,0.1); padding: 1px 6px; border-radius: 4px;">Padanan Bakat</span>
+                    </div>
+                    <p style="font-size: 9px; color: #9aa8e3; margin: 0 0 8px 0;">Bidang sukan yang paling bersesuaian dengan keupayaan fisiologi murid:</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 7px; flex: 1;">
+                        ${recs.slice(0, 3).map(rec => `
+                            <div style="background: rgba(255, 255, 255, 0.025); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 7px 9px; display: flex; align-items: center; gap: 9px;">
+                                <div style="width: 32px; height: 32px; border-radius: 7px; background: rgba(16, 185, 129, 0.15); color: #34d399; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0;">
+                                    ${sportEmojis[rec.name] || '🏅'}
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <strong style="font-size: 11.5px; color: #ffffff;">${rec.name}</strong>
+                                        <span style="font-size: 10px; font-weight: 700; color: #00f2fe; background: rgba(0, 242, 254, 0.1); padding: 1px 5px; border-radius: 4px;">${rec.percentage}%</span>
+                                    </div>
+                                    <div style="font-size: 9px; color: #9aa8e3; margin: 1px 0;">${rec.category} &bull; Kesesuaian: <strong style="color: #34d399;">${rec.level}</strong></div>
+                                    <div style="font-size: 8.5px; color: #94a3b8; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${rec.desc}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                        ${recs.length === 0 ? `
+                            <div style="text-align: center; color: #64748b; font-size: 11px; padding: 20px 0;">Sila masukkan skor ujian untuk menerima cadangan bidang sukan.</div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ringkasan Prestasi Keseluruhan -->
+            <div style="background: rgba(18, 26, 60, 0.5); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 10px; padding: 9px 14px; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <span style="font-size: 9.5px; color: #00f2fe; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Rumusan Analisis Bakat:</span>
+                    <p style="font-size: 10.5px; color: #cbd5e1; margin: 2px 0 0 0;">${strengthsText}</p>
+                </div>
+                <div style="text-align: right; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 14px; flex-shrink: 0;">
+                    <div style="font-size: 8.5px; color: #9aa8e3;">Tahap Purata Kecergasan</div>
+                    <span style="display: inline-block; font-size: 10.5px; font-weight: 700; color: #34d399; background: rgba(16,185,129,0.15); padding: 1px 7px; border-radius: 4px; margin-top: 2px;">
+                        ${overallFitness.rating} (${overallFitness.avgScore}/5.0)
+                    </span>
+                </div>
+            </div>
+
+            <!-- Footer Muka Surat 1 -->
+            <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 9.5px; color: #64748b;">
+                <span>Sistem Pengenalpastian Bakat Sukan (TID) Sekolah Rendah &bull; ${student.school || 'SK Taman Tun Dr Ismail'}</span>
+                <span>Muka Surat <strong>1</strong> daripada <strong>2</strong></span>
+            </div>
         </div>
-        <div style="text-align: right;">
-            <span style="color: #00f2fe; font-weight: 700; font-size: 18px;">TID Analyst</span>
-            <p style="color: #64748b; font-size: 11px; margin: 3px 0 0 0;">Tarikh Cetakan: ${new Date().toLocaleDateString('ms-MY')}</p>
+
+        <!-- ================= PAGE BREAK UNTUK HTML2PDF ================= -->
+        <div class="html2pdf__page-break" style="page-break-before: always; break-before: page; height: 0; margin: 0; padding: 0;"></div>
+
+        <!-- ================= MUKA SURAT 2 ================= -->
+        <div class="pdf-page-2" style="width: 794px; height: 1122px; box-sizing: border-box; padding: 24px 28px; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; background: #060919;">
+            <!-- Header Muka Surat 2 -->
+            <div style="border-bottom: 2px solid rgba(0, 242, 254, 0.3); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="font-size: 16px; margin: 0; font-weight: 700; color: #ffffff;">PERINCIAN SKOR UJIAN KECERGASAN FIZIKAL & PERAKUAN</h2>
+                    <p style="font-size: 10.5px; color: #9aa8e3; margin: 2px 0 0 0;">Lembaran Rekod Bateri Ujian Talent Identification (TID)</p>
+                </div>
+                <div style="text-align: right; font-size: 10.5px; color: #cbd5e1;">
+                    <div>Nama: <strong style="color: #fff;">${student.name}</strong></div>
+                    <div style="color: #64748b; font-size: 9.5px; margin-top: 1px;">Kelas: ${student.class} &bull; Umur: ${student.age} Tahun</div>
+                </div>
+            </div>
+
+            <!-- Jadual 6 Komponen Ujian TID -->
+            <div style="background: rgba(18, 26, 60, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 12px 14px;">
+                <div style="font-size: 11.5px; font-weight: 700; color: #00f2fe; margin-bottom: 7px; display: flex; justify-content: space-between;">
+                    <span>Jadual Keputusan 6 Bateri Ujian Fizikal TID</span>
+                    <span style="color: #64748b; font-size: 9.5px; font-weight: normal;">*Skor terbaik diambil kira untuk penggredan</span>
+                </div>
+                <table style="width: 100%; border-collapse: collapse; font-size: 10.5px; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 1.5px solid rgba(0, 242, 254, 0.3); color: #9aa8e3; font-size: 9.5px; text-transform: uppercase;">
+                            <th style="padding: 6px 8px; width: 30px;">Bil</th>
+                            <th style="padding: 6px 8px;">Komponen Ujian & Sasaran Fisiologi</th>
+                            <th style="padding: 6px 8px; width: 170px;">Rekod Percubaan</th>
+                            <th style="padding: 6px 8px; width: 90px; text-align: center;">Skor Terbaik</th>
+                            <th style="padding: 6px 8px; width: 110px; text-align: center;">Tahap / Gred</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${evaluatedComponents.map((c, idx) => `
+                            <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05); background: ${idx % 2 === 0 ? 'rgba(255,255,255,0.015)' : 'transparent'};">
+                                <td style="padding: 8px 8px; color: #64748b; font-weight: 600;">${idx + 1}</td>
+                                <td style="padding: 8px 8px;">
+                                    <div style="font-weight: 700; color: #ffffff; font-size: 11px;">${c.name}</div>
+                                    <div style="font-size: 9px; color: #9aa8e3; margin-top: 1px;">${c.cat}</div>
+                                </td>
+                                <td style="padding: 8px 8px; color: #cbd5e1; font-family: monospace; font-size: 9.5px;">${c.trialsStr}</td>
+                                <td style="padding: 8px 8px; text-align: center; font-weight: 700; color: #00f2fe; font-size: 11.5px;">
+                                    ${c.best !== null ? `${c.best} ${c.unit}` : '-'}
+                                </td>
+                                <td style="padding: 8px 8px; text-align: center;">
+                                    <span style="display: inline-block; font-size: 9.5px; font-weight: 600; padding: 2px 7px; border-radius: 4px; 
+                                        ${c.evalRes.score >= 4 ? 'background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3);' : 
+                                          c.evalRes.score === 3 ? 'background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3);' : 
+                                          'background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3);'}">
+                                        ${c.evalRes.rating}
+                                    </span>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Panduan Skor & Ulasan Guru (Grid 2 Kolum) -->
+            <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 14px;">
+                <!-- Panduan Skala Skor TID -->
+                <div style="background: rgba(18, 26, 60, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 10px 12px;">
+                    <div style="font-size: 10.5px; font-weight: 700; color: #00f2fe; margin-bottom: 5px;">Petunjuk Skala Prestasi Bateri TID:</div>
+                    <ul style="margin: 0; padding-left: 14px; font-size: 9.5px; color: #94a3b8; line-height: 1.45;">
+                        <li><strong style="color: #34d399;">5 - Cemerlang:</strong> Berpotensi tinggi peringkat daerah/negeri.</li>
+                        <li><strong style="color: #60a5fa;">4 - Baik:</strong> Melepasi purata norma kebangsaan.</li>
+                        <li><strong style="color: #fbbf24;">3 - Sederhana:</strong> Memenuhi keperluan asas fizikal sukan.</li>
+                        <li><strong style="color: #f87171;">1-2 - Perlu Latihan:</strong> Memerlukan program intervensi.</li>
+                    </ul>
+                </div>
+
+                <!-- Kotak Ulasan Jurulatih -->
+                <div style="background: rgba(18, 26, 60, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 10px 12px;">
+                    <div style="font-size: 10.5px; font-weight: 700; color: #00f2fe; margin-bottom: 5px;">Ulasan & Cadangan Guru Penilai / Jurulatih:</div>
+                    <div style="font-size: 10px; color: #cbd5e1; line-height: 1.4; background: rgba(0,0,0,0.2); padding: 7px 9px; border-radius: 6px; border: 1px dashed rgba(255,255,255,0.15);">
+                        Murid ini menunjukkan kecergasan fizikal pada tahap ${overallFitness.rating.toLowerCase()}. Disyorkan menyertai klinik sukan berfokus dalam bidang <strong>${recs.length > 0 ? recs[0].name : 'olahraga'}</strong> untuk mengasah bakat ke peringkat pertandingan seterusnya.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ruang Perakuan & Tandatangan Rasmi -->
+            <div style="background: rgba(18, 26, 60, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 14px 18px;">
+                <div style="font-size: 10.5px; font-weight: 700; color: #9aa8e3; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    Pengesahan & Perakuan Pegawai Penilai:
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 36px;">
+                    <!-- Tandatangan Guru Penilai -->
+                    <div>
+                        <div style="font-size: 10px; color: #cbd5e1; margin-bottom: 38px;">Disediakan Oleh (Guru Penilai / Jurulatih TID):</div>
+                        <div style="border-bottom: 1px dashed #64748b; margin-bottom: 5px;"></div>
+                        <div style="font-size: 9.5px; color: #94a3b8;">Nama: _____________________________________</div>
+                        <div style="font-size: 9.5px; color: #94a3b8; margin-top: 2px;">Tarikh: ____________________________________</div>
+                    </div>
+                    <!-- Tandatangan Guru Besar / GPK Kokurikulum -->
+                    <div>
+                        <div style="font-size: 10px; color: #cbd5e1; margin-bottom: 38px;">Disahkan Oleh (Guru Besar / GPK Kokurikulum):</div>
+                        <div style="border-bottom: 1px dashed #64748b; margin-bottom: 5px;"></div>
+                        <div style="font-size: 9.5px; color: #94a3b8;">Nama & Cop Rasmi: __________________________</div>
+                        <div style="font-size: 9.5px; color: #94a3b8; margin-top: 2px;">Tarikh: ____________________________________</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Muka Surat 2 -->
+            <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 9.5px; color: #64748b;">
+                <span>Dokumen ini disahkan bagi tujuan rekod rasmi Kokurikulum &bull; Dicetak melalui Sistem TID Analyst</span>
+                <span>Muka Surat <strong>2</strong> daripada <strong>2</strong></span>
+            </div>
         </div>
     `;
-    element.insertBefore(headerBanner, element.firstChild);
 
-    // Konfigurasi untuk html2pdf
+    document.body.appendChild(pdfWrapper);
+
+    // Beri masa sejenak untuk pelayar meletakkan elemen dan melukis imej/SVG
+    await new Promise(resolve => setTimeout(resolve, 120));
+
+    // Konfigurasi untuk html2pdf - Menjamin tepat 2 muka surat bersaiz A4
     const opt = {
-        margin:       [0.4, 0.4, 0.4, 0.4],
-        filename:     `Laporan_TID_${studentName.trim().replace(/\s+/g, '_')}.pdf`,
+        margin:       0,
+        filename:     `Laporan_TID_${student.name.trim().replace(/\s+/g, '_')}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { 
             scale: 2, 
             useCORS: true, 
             backgroundColor: '#060919',
             logging: false,
-            windowWidth: 1024,
-            media: 'screen'
+            scrollX: 0,
+            scrollY: 0,
+            x: 0,
+            y: 0,
+            windowWidth: 794
         },
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak:    { mode: ['css', 'legacy'], before: '.html2pdf__page-break' }
     };
 
-    // Jalankan html2pdf
-    html2pdf().set(opt).from(element).save().then(() => {
-        element.remove();
-        if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = originalText;
-        }
-    }).catch(err => {
+    try {
+        await html2pdf().set(opt).from(pdfWrapper).save();
+    } catch (err) {
         console.error('PDF Generation Error:', err);
-        element.remove();
+        alert('Ralat semasa menjana PDF. Anda juga boleh menggunakan butang "Cetak Laporan" di atas untuk mencetak atau menyimpan terus sebagai PDF.');
+    } finally {
+        if (pdfWrapper && pdfWrapper.parentNode) {
+            pdfWrapper.parentNode.removeChild(pdfWrapper);
+        }
         if (btn) {
             btn.disabled = false;
             btn.innerHTML = originalText;
         }
-        alert('Ralat semasa menjana PDF. Sila cuba lagi.');
-    });
+    }
 }
 
 function downloadStudentPDF() {
     const nameEl = document.querySelector('#student-portal-report-container h2');
     const studentName = nameEl ? nameEl.innerText : 'Laporan_Murid';
-    downloadPDF('student-portal-report-container', studentName, 'btn-download-student-pdf');
+    const student = students.find(s => s.id === selectedStudentId) || students.find(s => s.name.trim().toLowerCase() === studentName.trim().toLowerCase()) || (students.length > 0 ? students[0] : null);
+    downloadPDF('student-portal-report-container', studentName, 'btn-download-student-pdf', student);
 }
 
 function downloadAdminPDF() {
-    const nameEl = document.getElementById('prof-name');
-    const studentName = nameEl ? nameEl.innerText : 'Laporan_Atlet';
-    downloadPDF('admin-profile-grid', studentName, 'btn-download-admin-pdf');
+    const student = students.find(s => s.id === selectedStudentId) || (students.length > 0 ? students[0] : null);
+    const studentName = student ? student.name : (document.getElementById('prof-name') ? document.getElementById('prof-name').innerText : 'Laporan_Atlet');
+    downloadPDF('admin-profile-grid', studentName, 'btn-download-admin-pdf', student);
 }
+
+// ==========================================
+// Logik Pengurusan Guru (Admin View)
+// ==========================================
+let teachers = [];
+
+async function loadTeachers() {
+    try {
+        const response = await fetch('api.php?action=list_teachers');
+        if (!response.ok) throw new Error('Gagal memuatkan data guru.');
+        teachers = await response.json();
+        renderTeachersTable();
+    } catch (err) {
+        console.error(err);
+        const tbody = document.querySelector('#teachers-table tbody');
+        if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--color-danger); padding: 2rem;">Ralat memuatkan data guru.</td></tr>`;
+        }
+    }
+}
+
+function renderTeachersTable() {
+    const tbody = document.querySelector('#teachers-table tbody');
+    if (!tbody) return;
+
+    if (teachers.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 3rem;"><i class="fa-solid fa-user-tie" style="font-size: 2.5rem; display: block; margin-bottom: 1rem;"></i>Tiada guru didaftarkan.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = '';
+    teachers.forEach(t => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>${t.name}</strong></td>
+            <td><code>${t.username}</code></td>
+            <td>${t.phone || '-'}</td>
+            <td>${t.school || '-'}</td>
+            <td>
+                <button class="btn btn-danger btn-sm" onclick="handleDeleteTeacher('${t.id}')" title="Padam Guru" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function setupAdminTeacherRegister() {
+    const form = document.getElementById('admin-teacher-register-form');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('admin-t-name').value;
+        const username = document.getElementById('admin-t-username').value;
+        const phone = document.getElementById('admin-t-phone').value;
+        const school = document.getElementById('admin-t-school').value;
+        const passcode = document.getElementById('admin-t-passcode').value;
+
+        const errorAlert = document.getElementById('admin-t-error-msg');
+        const successAlert = document.getElementById('admin-t-success-msg');
+
+        errorAlert.style.display = 'none';
+        successAlert.style.display = 'none';
+
+        try {
+            const response = await fetch('api.php?action=register_teacher', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, username, phone, school, passcode })
+            });
+
+            const result = await response.json();
+            if (response.ok && result.success) {
+                successAlert.style.display = 'block';
+                form.reset();
+                document.getElementById('admin-t-school').value = 'SK Taman Tun Dr Ismail';
+                loadTeachers();
+                setTimeout(() => {
+                    successAlert.style.display = 'none';
+                }, 3000);
+            } else {
+                errorAlert.innerText = result.error || 'Gagal mendaftar guru.';
+                errorAlert.style.display = 'block';
+            }
+        } catch (err) {
+            errorAlert.innerText = 'Ralat rangkaian. Sila cuba lagi.';
+            errorAlert.style.display = 'block';
+        }
+    });
+}
+
+async function handleDeleteTeacher(id) {
+    if (!confirm('Adakah anda pasti mahu memadam akaun guru ini?')) return;
+
+    try {
+        const response = await fetch('api.php?action=delete_teacher', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, role: 'Admin' })
+        });
+        const result = await response.json();
+        if (response.ok && result.success) {
+            loadTeachers();
+        } else {
+            alert(result.error || 'Gagal memadam guru.');
+        }
+    } catch (err) {
+        alert('Ralat rangkaian. Sila cuba lagi.');
+    }
+}
+window.handleDeleteTeacher = handleDeleteTeacher;
+window.loadTeachers = loadTeachers;
+window.renderTeachersTable = renderTeachersTable;
+window.setupAdminTeacherRegister = setupAdminTeacherRegister;

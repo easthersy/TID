@@ -3,6 +3,7 @@ header('Content-Type: application/json');
 
 $dataPath = __DIR__ . '/data';
 $dataFile = $dataPath . '/students.json';
+$teacherFile = $dataPath . '/teachers.json';
 
 // Cipta folder data jika belum wujud
 if (!file_exists($dataPath)) {
@@ -12,6 +13,11 @@ if (!file_exists($dataPath)) {
 // Cipta fail students.json jika belum wujud
 if (!file_exists($dataFile)) {
     file_put_contents($dataFile, json_encode([]));
+}
+
+// Cipta fail teachers.json jika belum wujud
+if (!file_exists($teacherFile)) {
+    file_put_contents($teacherFile, json_encode([]));
 }
 
 // Membaca data murid dari fail JSON
@@ -26,6 +32,20 @@ function readData() {
 function writeData($data) {
     global $dataFile;
     file_put_contents($dataFile, json_encode($data, JSON_PRETTY_PRINT));
+}
+
+// Membaca data guru dari fail JSON
+function readTeachersData() {
+    global $teacherFile;
+    $content = file_get_contents($teacherFile);
+    $data = json_decode($content, true);
+    return is_array($data) ? $data : [];
+}
+
+// Menyimpan data guru ke fail JSON
+function writeTeachersData($data) {
+    global $teacherFile;
+    file_put_contents($teacherFile, json_encode($data, JSON_PRETTY_PRINT));
 }
 
 $action = isset($_GET['action']) ? $_GET['action'] : '';
@@ -192,6 +212,144 @@ switch ($action) {
             } else {
                 http_response_code(404);
                 echo json_encode(['error' => 'Murid tidak ditemui']);
+            }
+        } else {
+            http_response_code(405);
+            echo json_encode(['error' => 'Kaedah tidak dibenarkan']);
+        }
+        break;
+
+    case 'list_teachers':
+        if ($method === 'GET') {
+            $teachers = readTeachersData();
+            $filteredTeachers = array_map(function($teacher) {
+                unset($teacher['passcode']);
+                return $teacher;
+            }, $teachers);
+            echo json_encode($filteredTeachers);
+        } else {
+            http_response_code(405);
+            echo json_encode(['error' => 'Kaedah tidak dibenarkan']);
+        }
+        break;
+
+    case 'register_teacher':
+        if ($method === 'POST') {
+            $input = json_decode(file_get_contents('php://input'), true);
+            if (!$input) {
+                $input = $_POST;
+            }
+
+            if (empty($input['name']) || empty($input['username']) || empty($input['passcode'])) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Nama, ID Pengguna, dan Kata Laluan wajib diisi.']);
+                exit;
+            }
+
+            $username = strtolower(trim(htmlspecialchars($input['username'])));
+            $teachers = readTeachersData();
+
+            foreach ($teachers as $teacher) {
+                if (strtolower($teacher['username']) === $username) {
+                    http_response_code(400);
+                    echo json_encode(['error' => 'ID Pengguna ini telah berdaftar. Sila guna ID lain.']);
+                    exit;
+                }
+            }
+
+            $newTeacher = [
+                'id' => uniqid('tchr_', true),
+                'name' => htmlspecialchars($input['name']),
+                'username' => $username,
+                'phone' => isset($input['phone']) ? htmlspecialchars($input['phone']) : '',
+                'school' => isset($input['school']) ? htmlspecialchars($input['school']) : '',
+                'passcode' => $input['passcode'],
+                'created_at' => date('Y-m-d H:i:s')
+            ];
+
+            $teachers[] = $newTeacher;
+            writeTeachersData($teachers);
+
+            unset($newTeacher['passcode']);
+            echo json_encode(['success' => true, 'teacher' => $newTeacher]);
+        } else {
+            http_response_code(405);
+            echo json_encode(['error' => 'Kaedah tidak dibenarkan']);
+        }
+        break;
+
+    case 'delete_teacher':
+        if ($method === 'POST') {
+            $input = json_decode(file_get_contents('php://input'), true);
+            if (!$input || empty($input['id'])) {
+                http_response_code(400);
+                echo json_encode(['error' => 'ID guru diperlukan']);
+                exit;
+            }
+
+            $role = isset($input['role']) ? $input['role'] : '';
+            if ($role !== 'Admin') {
+                http_response_code(403);
+                echo json_encode(['error' => 'Akses dinafikan. Hanya Admin dibenarkan memadam rekod guru.']);
+                exit;
+            }
+
+            $teachers = readTeachersData();
+            $newTeachers = [];
+            $deleted = false;
+
+            foreach ($teachers as $teacher) {
+                if ($teacher['id'] === $input['id']) {
+                    $deleted = true;
+                    continue;
+                }
+                $newTeachers[] = $teacher;
+            }
+
+            if ($deleted) {
+                writeTeachersData($newTeachers);
+                echo json_encode(['success' => true]);
+            } else {
+                http_response_code(404);
+                echo json_encode(['error' => 'Guru tidak ditemui']);
+            }
+        } else {
+            http_response_code(405);
+            echo json_encode(['error' => 'Kaedah tidak dibenarkan']);
+        }
+        break;
+
+    case 'login_teacher':
+        if ($method === 'POST') {
+            $input = json_decode(file_get_contents('php://input'), true);
+            if (!$input) {
+                $input = $_POST;
+            }
+
+            if (empty($input['username']) || empty($input['passcode'])) {
+                http_response_code(400);
+                echo json_encode(['error' => 'ID Pengguna dan Kata Laluan diperlukan.']);
+                exit;
+            }
+
+            $username = strtolower(trim($input['username']));
+            $passcode = $input['passcode'];
+            $teachers = readTeachersData();
+            $found = null;
+
+            foreach ($teachers as $teacher) {
+                if (strtolower($teacher['username']) === $username && $teacher['passcode'] === $passcode) {
+                    $found = $teacher;
+                    break;
+                }
+            }
+
+            if ($found) {
+                unset($found['passcode']);
+                echo json_encode(['success' => true, 'teacher' => $found]);
+            } else {
+                http_response_code(401);
+                echo json_encode(['error' => 'ID Pengguna atau Kata Laluan salah.']);
             }
         } else {
             http_response_code(405);

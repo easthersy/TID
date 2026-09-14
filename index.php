@@ -11,7 +11,7 @@
     <!-- html2pdf.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <!-- Custom Style Sheet -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=<?= time() ?>">
 </head>
 <body>
 
@@ -51,15 +51,70 @@
                 <form id="login-form" style="display: none; margin-top: 2.5rem;">
                     <input type="hidden" id="login-selected-role">
                     
-                    <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <!-- Username Field (Hidden by default, shown for Cikgu) -->
+                    <div class="form-group" id="login-username-group" style="margin-bottom: 1.5rem; display: none;">
+                        <label for="login-username" style="font-family: var(--font-outfit); font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase;">ID Pengguna / E-mel</label>
+                        <input type="text" id="login-username" class="form-control" placeholder="Masukkan ID Pengguna...">
+                    </div>
+                    
+                    <div class="form-group" id="login-passcode-group" style="margin-bottom: 1.5rem;">
                         <label for="login-passcode" id="passcode-label" style="font-family: var(--font-outfit); font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase;">Kata Laluan</label>
                         <input type="password" id="login-passcode" class="form-control" placeholder="Masukkan kata laluan...">
                         <p id="login-error-msg" style="color: var(--color-danger); font-size: 0.8rem; margin-top: 0.5rem; display: none;">Kata laluan salah. Sila cuba lagi.</p>
                     </div>
                     
+                    <!-- Register Link (Only shown for Cikgu role selection) -->
+                    <div id="register-teacher-link-container" style="margin-bottom: 1.5rem; text-align: center; display: none;">
+                        <a href="javascript:void(0)" id="btn-show-teacher-register" style="font-family: var(--font-outfit); font-size: 0.85rem; color: var(--accent-purple); text-decoration: none; font-weight: 500;">
+                            <i class="fa-solid fa-user-plus" style="margin-right: 0.25rem;"></i> Belum berdaftar? Daftar Akaun Cikgu Baharu
+                        </a>
+                    </div>
+                    
                     <div style="display: flex; gap: 1rem;">
                         <button type="button" class="btn btn-secondary" id="btn-login-back" style="flex: 1; justify-content: center;">Kembali</button>
                         <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center;"><i class="fa-solid fa-right-to-bracket"></i> Log Masuk</button>
+                    </div>
+                </form>
+
+                <!-- Teacher Registration Form (Hidden by default) -->
+                <form id="teacher-register-form" style="display: none; margin-top: 2.5rem;">
+                    <h4 style="text-align: center; margin-bottom: 1.5rem; font-family: var(--font-outfit); color: var(--accent-purple); font-size: 1.2rem; font-weight: 600;">
+                        <i class="fa-solid fa-user-tie"></i> Daftar Cikgu Baharu
+                    </h4>
+                    
+                    <div class="form-group" style="margin-bottom: 1rem;">
+                        <label for="reg-t-name" style="font-family: var(--font-outfit); font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase;">Nama Penuh</label>
+                        <input type="text" id="reg-t-name" class="form-control" placeholder="Contoh: Cikgu Rohana" required>
+                    </div>
+                    
+                    <div class="form-grid" style="margin-bottom: 1rem;">
+                        <div class="form-group">
+                            <label for="reg-t-username" style="font-family: var(--font-outfit); font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase;">ID Pengguna / E-mel</label>
+                            <input type="text" id="reg-t-username" class="form-control" placeholder="Contoh: rohana123" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-t-phone" style="font-family: var(--font-outfit); font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase;">Nombor Telefon</label>
+                            <input type="text" id="reg-t-phone" class="form-control" placeholder="Contoh: 0123456789">
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid" style="margin-bottom: 1.5rem;">
+                        <div class="form-group">
+                            <label for="reg-t-school" style="font-family: var(--font-outfit); font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase;">Sekolah</label>
+                            <input type="text" id="reg-t-school" class="form-control" value="SK Taman Tun Dr Ismail" placeholder="Nama sekolah...">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-t-passcode" style="font-family: var(--font-outfit); font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase;">Kata Laluan</label>
+                            <input type="password" id="reg-t-passcode" class="form-control" placeholder="Masukkan kata laluan..." required>
+                        </div>
+                    </div>
+                    
+                    <p id="reg-t-error-msg" style="color: var(--color-danger); font-size: 0.8rem; margin-top: -0.5rem; margin-bottom: 1rem; display: none;"></p>
+                    <p id="reg-t-success-msg" style="color: var(--color-success); font-size: 0.8rem; margin-top: -0.5rem; margin-bottom: 1rem; display: none;">Pendaftaran berjaya! Sila log masuk.</p>
+                    
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="button" class="btn btn-secondary" id="btn-reg-t-back" style="flex: 1; justify-content: center;">Kembali</button>
+                        <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center; background: var(--accent-purple); border-color: var(--accent-purple); box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);"><i class="fa-solid fa-user-plus"></i> Daftar Guru</button>
                     </div>
                 </form>
             </div>
@@ -93,6 +148,9 @@
                 </li>
                 <li class="menu-item" data-tab="analytics">
                     <a href="javascript:void(0)"><i class="fa-solid fa-chart-line"></i><span>Analitis Kumpulan</span></a>
+                </li>
+                <li class="menu-item" data-tab="teachers">
+                    <a href="javascript:void(0)"><i class="fa-solid fa-chalkboard-user"></i><span>Urus Cikgu</span></a>
                 </li>
                 <li class="menu-item" style="margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
                     <a href="javascript:void(0)" onclick="handleLogout()" style="color: #f87171;"><i class="fa-solid fa-right-from-bracket" style="color: #f87171;"></i><span>Log Keluar</span></a>
@@ -541,6 +599,79 @@
                 </div>
             </section>
 
+            <!-- URUS GURU / TEACHERS TAB -->
+            <section id="teachers" class="tab-content">
+                <div class="page-header">
+                    <div class="page-title">
+                        <h1>Pengurusan Guru / Jurulatih</h1>
+                        <p>Daftar akaun guru baharu dan urus akses sistem TID untuk staf sekolah.</p>
+                    </div>
+                </div>
+
+                <div class="visuals-grid" style="margin-bottom: 2rem;">
+                    <!-- Senarai Guru Card -->
+                    <div class="card" style="padding: 1.5rem;">
+                        <h3 style="margin-bottom: 1.25rem;"><i class="fa-solid fa-chalkboard-user" style="color: var(--accent-purple); margin-right: 0.5rem;"></i>Senarai Guru Berdaftar</h3>
+                        <div class="table-responsive">
+                            <table class="custom-table" id="teachers-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nama Penuh</th>
+                                        <th>ID Pengguna</th>
+                                        <th>Telefon</th>
+                                        <th>Sekolah</th>
+                                        <th>Tindakan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 3rem;">
+                                            <i class="fa-solid fa-user-tie" style="font-size: 2.5rem; display: block; margin-bottom: 1rem;"></i>
+                                            Memuatkan data guru...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Borang Tambah Guru (Admin View) -->
+                    <div class="card" style="padding: 1.5rem; height: fit-content;">
+                        <h3 style="margin-bottom: 1.25rem;"><i class="fa-solid fa-user-plus" style="color: var(--accent-purple); margin-right: 0.5rem;"></i>Daftar Guru Baharu</h3>
+                        
+                        <form id="admin-teacher-register-form">
+                            <div class="form-group" style="margin-bottom: 1rem;">
+                                <label for="admin-t-name">Nama Penuh</label>
+                                <input type="text" id="admin-t-name" class="form-control" placeholder="Nama penuh guru..." required>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 1rem;">
+                                <label for="admin-t-username">ID Pengguna / E-mel</label>
+                                <input type="text" id="admin-t-username" class="form-control" placeholder="ID login..." required>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 1rem;">
+                                <label for="admin-t-phone">Nombor Telefon</label>
+                                <input type="text" id="admin-t-phone" class="form-control" placeholder="Nombor telefon...">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 1rem;">
+                                <label for="admin-t-school">Sekolah</label>
+                                <input type="text" id="admin-t-school" class="form-control" value="SK Taman Tun Dr Ismail" placeholder="Nama sekolah...">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 1.5rem;">
+                                <label for="admin-t-passcode">Kata Laluan</label>
+                                <input type="password" id="admin-t-passcode" class="form-control" placeholder="Kata laluan..." required>
+                            </div>
+                            
+                            <p id="admin-t-error-msg" style="color: var(--color-danger); font-size: 0.8rem; margin-top: -0.5rem; margin-bottom: 1rem; display: none;"></p>
+                            <p id="admin-t-success-msg" style="color: var(--color-success); font-size: 0.8rem; margin-top: -0.5rem; margin-bottom: 1rem; display: none;">Guru berjaya didaftarkan!</p>
+
+                            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; background: var(--accent-purple); border-color: var(--accent-purple); box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);">
+                                <i class="fa-solid fa-user-plus"></i> Daftar Guru
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
             <!-- PORTAL ANAK MURID TAB -->
             <section id="student-portal" class="tab-content">
                 <div class="page-header">
@@ -579,6 +710,6 @@
     </div>
 
     <!-- Custom App JavaScript -->
-    <script src="app.js"></script>
+    <script src="app.js?v=<?= time() ?>"></script>
 </body>
 </html>
