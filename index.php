@@ -33,50 +33,37 @@
                 
                 <div class="role-cards-grid" style="grid-template-columns: repeat(2, 1fr); max-width: 440px; margin: 0 auto;">
                     <!-- Individu (Akses Penuh) Card -->
-                    <div class="role-card" data-role="Admin" id="card-role-admin">
+                    <div class="role-card" data-role="Admin" id="card-role-admin" title="Klik untuk terus masuk sebagai Individu (Akses Penuh)">
                         <i class="fa-solid fa-user-gear role-card-icon" style="color: var(--accent-primary);"></i>
                         <h4>Individu</h4>
+                        <span style="font-size: 0.72rem; color: #16a34a; font-weight: 600; background: #dcfce7; padding: 0.15rem 0.5rem; border-radius: 12px; margin-top: 0.25rem;">Akses Terus (1-Klik)</span>
                     </div>
                     <!-- Sekolah Card -->
-                    <div class="role-card" data-role="Individu" id="card-role-individual">
+                    <div class="role-card" data-role="Individu" id="card-role-individual" title="Klik untuk pilih sekolah dan masuk ke portal">
                         <i class="fa-solid fa-school role-card-icon" style="color: var(--accent-primary);"></i>
                         <h4>Sekolah</h4>
+                        <span style="font-size: 0.72rem; color: #2563eb; font-weight: 600; background: #dbeafe; padding: 0.15rem 0.5rem; border-radius: 12px; margin-top: 0.25rem;">Pilih Sekolah</span>
                     </div>
                 </div>
 
-                <!-- Form Log Masuk -->
-                <form id="login-form" style="display: none; margin-top: 2rem;">
-                    <input type="hidden" id="login-selected-role">
-                    
-                    <!-- Individu: ID Pengguna Field -->
-                    <div class="form-group" id="login-admin-user-group" style="margin-bottom: 1.25rem; display: none;">
-                        <label for="login-username" style="font-family: var(--font-outfit); font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase;">ID Pengguna Individu</label>
-                        <input type="text" id="login-username" class="form-control" placeholder="Contoh: admin / id pengguna">
-                    </div>
-
-                    <!-- Sekolah: Kod Sekolah Field -->
-                    <div class="form-group" id="login-school-code-group" style="margin-bottom: 1.25rem; display: none;">
-                        <label for="login-school-code" style="font-family: var(--font-outfit); font-size: 0.85rem; color: var(--accent-purple); text-transform: uppercase; font-weight: 600;">
-                            <i class="fa-solid fa-key" style="margin-right: 0.3rem;"></i>Kod Sekolah
+                <!-- Form Log Masuk Sekolah (Pilihan Dropdown Pantas & Kod) -->
+                <div id="school-select-container" style="display: none; margin-top: 1.75rem; text-align: left;">
+                    <div class="form-group" style="margin-bottom: 1.25rem;">
+                        <label for="login-school-select" style="font-family: var(--font-outfit); font-size: 0.85rem; color: var(--text-primary); font-weight: 700;">
+                            <i class="fa-solid fa-school" style="margin-right: 0.35rem; color: var(--accent-primary);"></i> Pilih Sekolah Anda:
                         </label>
-                        <input type="text" id="login-school-code" class="form-control" placeholder="Contoh: SKTTDI2026" style="text-transform: uppercase; font-weight: 600; letter-spacing: 1px;">
-                        <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.25rem; display: block;">Masukkan Kod Sekolah yang didaftarkan.</small>
-                    </div>
-                    
-                    <!-- Password Field -->
-                    <div class="form-group" id="login-passcode-group" style="margin-bottom: 1.25rem;">
-                        <label for="login-passcode" id="passcode-label" style="font-family: var(--font-outfit); font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase;">Kata Laluan</label>
-                        <input type="password" id="login-passcode" class="form-control" placeholder="Masukkan kata laluan..." required>
-                        <p id="login-error-msg" style="color: var(--color-danger); font-size: 0.8rem; margin-top: 0.5rem; display: none;"></p>
+                        <select id="login-school-select" class="form-control" style="font-size: 0.95rem; padding: 0.65rem 0.85rem;">
+                            <option value="" disabled selected>Pilih Sekolah Berdaftar...</option>
+                        </select>
                     </div>
 
-                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                        <button type="button" class="btn btn-secondary" id="btn-login-back" style="flex: 1; justify-content: center;">Kembali</button>
-                        <button type="submit" class="btn btn-primary" id="btn-login-submit" style="flex: 1; justify-content: center;">
-                            <i class="fa-solid fa-right-to-bracket"></i> Log Masuk
+                    <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem;">
+                        <button type="button" class="btn btn-secondary" id="btn-school-back" style="flex: 1; justify-content: center;">Kembali</button>
+                        <button type="button" class="btn btn-primary" id="btn-school-enter" style="flex: 2; justify-content: center;">
+                            <i class="fa-solid fa-right-to-bracket"></i> Masuk Portal Sekolah
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
             
             <div class="login-footer">

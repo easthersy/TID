@@ -116,101 +116,56 @@ function switchTab(tabId) {
 function setupLoginSystem() {
     const cardAdmin = document.getElementById('card-role-admin');
     const cardIndividu = document.getElementById('card-role-individual');
-    const loginForm = document.getElementById('login-form');
-    const hiddenRole = document.getElementById('login-selected-role');
-    const adminUserGroup = document.getElementById('login-admin-user-group');
-    const schoolCodeGroup = document.getElementById('login-school-code-group');
-    const passcodeLabel = document.getElementById('passcode-label');
-    const passcodeField = document.getElementById('login-passcode');
-    const errorMsg = document.getElementById('login-error-msg');
-    const backBtn = document.getElementById('btn-login-back');
+    const schoolContainer = document.getElementById('school-select-container');
+    const schoolSelect = document.getElementById('login-school-select');
+    const btnSchoolEnter = document.getElementById('btn-school-enter');
+    const btnSchoolBack = document.getElementById('btn-school-back');
 
-    function selectRole(role) {
-        document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
-        hiddenRole.value = role;
-        errorMsg.style.display = 'none';
-        passcodeField.value = '';
-
-        loginForm.style.display = 'block';
-
-        if (role === 'Admin') {
-            cardAdmin.classList.add('selected');
-            adminUserGroup.style.display = 'block';
-            document.getElementById('login-username').setAttribute('required', 'required');
-            schoolCodeGroup.style.display = 'none';
-            document.getElementById('login-school-code').removeAttribute('required');
-            passcodeLabel.innerText = 'Kata Laluan Individu';
-        } else {
-            cardIndividu.classList.add('selected');
-            adminUserGroup.style.display = 'none';
-            document.getElementById('login-username').removeAttribute('required');
-            schoolCodeGroup.style.display = 'block';
-            document.getElementById('login-school-code').setAttribute('required', 'required');
-            passcodeLabel.innerText = 'Kata Laluan Sekolah';
-        }
-    }
-
-    if (cardAdmin) cardAdmin.addEventListener('click', () => selectRole('Admin'));
-    if (cardIndividu) cardIndividu.addEventListener('click', () => selectRole('Individu'));
-
-    if (backBtn) {
-        backBtn.addEventListener('click', () => {
-            loginForm.style.display = 'none';
+    // 1. Klik Individu -> Akses Terus Penuh
+    if (cardAdmin) {
+        cardAdmin.addEventListener('click', () => {
             document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
-            hiddenRole.value = '';
-            errorMsg.style.display = 'none';
+            cardAdmin.classList.add('selected');
+            loginUser('Admin', {
+                id: 'adm_default',
+                username: 'admin',
+                name: 'Pengguna Individu'
+            });
         });
     }
 
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const role = hiddenRole.value;
-            errorMsg.style.display = 'none';
+    // 2. Klik Sekolah -> Papar Pemilihan Sekolah
+    if (cardIndividu) {
+        cardIndividu.addEventListener('click', () => {
+            document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+            cardIndividu.classList.add('selected');
+            if (schoolContainer) schoolContainer.style.display = 'block';
+            populateSchoolDropdowns();
+        });
+    }
 
-            if (role === 'Admin') {
-                const username = document.getElementById('login-username').value.trim();
-                const password = passcodeField.value.trim();
-
-                try {
-                    const res = await fetch('api.php?action=login_admin', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username, password })
-                    });
-                    const result = await res.json();
-                    if (res.ok && result.success) {
-                        loginUser('Admin', result.admin);
-                    } else {
-                        errorMsg.innerText = result.error || 'ID Pengguna atau Kata Laluan salah.';
-                        errorMsg.style.display = 'block';
-                    }
-                } catch (err) {
-                    errorMsg.innerText = 'Ralat menyambung ke pelayan.';
-                    errorMsg.style.display = 'block';
-                }
-            } else if (role === 'Individu') {
-                const school_code = document.getElementById('login-school-code').value.trim();
-                const password = passcodeField.value.trim();
-
-                try {
-                    const res = await fetch('api.php?action=login_individual', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ school_code, password })
-                    });
-                    const result = await res.json();
-                    if (res.ok && result.success) {
-                        loginUser('Individu', result.school);
-                    } else {
-                        errorMsg.innerText = result.error || 'Kod Sekolah atau Kata Laluan salah.';
-                        errorMsg.style.display = 'block';
-                    }
-                } catch (err) {
-                    errorMsg.innerText = 'Ralat menyambung ke pelayan.';
-                    errorMsg.style.display = 'block';
-                }
+    // 3. Masuk Portal Sekolah
+    if (btnSchoolEnter) {
+        btnSchoolEnter.addEventListener('click', () => {
+            const code = schoolSelect ? schoolSelect.value : '';
+            if (!code) {
+                alert('Sila pilih sekolah anda terlebih dahulu daripada menu pilihan.');
+                return;
             }
+            const foundSchool = schools.find(s => s.code === code);
+            if (foundSchool) {
+                loginUser('Individu', foundSchool);
+            } else {
+                alert('Sekolah tidak dijumpai dalam pangkalan data.');
+            }
+        });
+    }
+
+    // 4. Butang Kembali
+    if (btnSchoolBack) {
+        btnSchoolBack.addEventListener('click', () => {
+            if (schoolContainer) schoolContainer.style.display = 'none';
+            document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
         });
     }
 }
@@ -239,13 +194,9 @@ function handleLogout() {
 
     document.body.classList.remove('logged-in', 'role-admin', 'role-individual');
 
-    const loginForm = document.getElementById('login-form');
-    if (loginForm) loginForm.style.display = 'none';
+    const schoolContainer = document.getElementById('school-select-container');
+    if (schoolContainer) schoolContainer.style.display = 'none';
     document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
-    const hiddenRole = document.getElementById('login-selected-role');
-    if (hiddenRole) hiddenRole.value = '';
-    const err = document.getElementById('login-error-msg');
-    if (err) err.style.display = 'none';
 }
 
 function checkSession() {
@@ -580,6 +531,20 @@ function populateSchoolDropdowns() {
             analyticsSchoolSelect.appendChild(opt);
         });
         if (currentVal) analyticsSchoolSelect.value = currentVal;
+    }
+
+    const loginSchoolSelect = document.getElementById('login-school-select');
+    if (loginSchoolSelect) {
+        const currentVal = loginSchoolSelect.value;
+        loginSchoolSelect.innerHTML = '<option value="" disabled selected>Pilih Sekolah Berdaftar...</option>';
+        schools.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.code;
+            opt.setAttribute('data-name', s.name);
+            opt.innerText = `${s.name} (${s.code})`;
+            loginSchoolSelect.appendChild(opt);
+        });
+        if (currentVal) loginSchoolSelect.value = currentVal;
     }
 }
 
