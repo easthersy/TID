@@ -1,0 +1,16 @@
+[
+    {
+        "id": "adm_default",
+        "username": "admin",
+        "password": "admin123",
+        "name": "Pentadbir Utama",
+        "created_at": "2026-10-01 04:58:47"
+    },
+    {
+        "id": "adm_6ac30b0d30be73.91268521",
+        "username": "ainfazira",
+        "password": "Nurain_01",
+        "name": "Ain Fazira",
+        "created_at": "2026-10-05 04:27:25"
+    }
+]

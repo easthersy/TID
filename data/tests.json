@@ -1,0 +1,178 @@
+{
+    "test1": {
+        "id": "test1",
+        "title": "Ujian 1 (Bateri Asas TID)",
+        "description": "6 bateri ujian standard penilaian kecergasan dan pengenalpastian bakat sukan.",
+        "components": [
+            {
+                "key": "sit_reach",
+                "name": "Sit & Reach (Kelenturan)",
+                "unit": "cm",
+                "desc": "Mengukur kelenturan bahagian belakang dan otot hamstring.",
+                "metric_male": {
+                    "cemerlang": 30,
+                    "baik": 24,
+                    "sederhana": 17,
+                    "kurang": 11
+                },
+                "metric_female": {
+                    "cemerlang": 32,
+                    "baik": 26,
+                    "sederhana": 19,
+                    "kurang": 13
+                }
+            },
+            {
+                "key": "sit_up",
+                "name": "30s Sit-Up (Daya Tahan)",
+                "unit": "kali",
+                "desc": "Mengukur kekuatan dan daya tahan otot abdomen.",
+                "metric_male": {
+                    "cemerlang": 22,
+                    "baik": 18,
+                    "sederhana": 13,
+                    "kurang": 8
+                },
+                "metric_female": {
+                    "cemerlang": 19,
+                    "baik": 15,
+                    "sederhana": 11,
+                    "kurang": 6
+                }
+            },
+            {
+                "key": "long_jump",
+                "name": "Standing Long Jump (Kuasa)",
+                "unit": "cm",
+                "desc": "Mengukur kuasa letupan otot kaki.",
+                "metric_male": {
+                    "cemerlang": 175,
+                    "baik": 150,
+                    "sederhana": 125,
+                    "kurang": 100
+                },
+                "metric_female": {
+                    "cemerlang": 160,
+                    "baik": 135,
+                    "sederhana": 110,
+                    "kurang": 85
+                }
+            },
+            {
+                "key": "sprint_10m",
+                "name": "10m Sprint (Kelajuan)",
+                "unit": "saat",
+                "desc": "Mengukur kelajuan larian pecutan pantas.",
+                "metric_male": {
+                    "cemerlang": 2,
+                    "baik": 2.29999999999999982236431605997495353221893310546875,
+                    "sederhana": 2.600000000000000088817841970012523233890533447265625,
+                    "kurang": 3
+                },
+                "metric_female": {
+                    "cemerlang": 2.20000000000000017763568394002504646778106689453125,
+                    "baik": 2.5,
+                    "sederhana": 2.79999999999999982236431605997495353221893310546875,
+                    "kurang": 3.20000000000000017763568394002504646778106689453125
+                }
+            },
+            {
+                "key": "shuttle_run",
+                "name": "10m Shuttle Run (Ketangkasan)",
+                "unit": "saat",
+                "desc": "Mengukur ketangkasan dan koordinasi perubahan arah pantas.",
+                "metric_male": {
+                    "cemerlang": 10,
+                    "baik": 11.199999999999999289457264239899814128875732421875,
+                    "sederhana": 12.5,
+                    "kurang": 13.800000000000000710542735760100185871124267578125
+                },
+                "metric_female": {
+                    "cemerlang": 10.5,
+                    "baik": 11.800000000000000710542735760100185871124267578125,
+                    "sederhana": 13,
+                    "kurang": 14.5
+                }
+            },
+            {
+                "key": "hand_eye",
+                "name": "Hand-Eye Coordination (Koordinasi)",
+                "unit": "tangkapan",
+                "desc": "Mengukur koordinasi pergerakan motor mata dan tangan.",
+                "metric_male": {
+                    "cemerlang": 18,
+                    "baik": 14,
+                    "sederhana": 10,
+                    "kurang": 6
+                },
+                "metric_female": {
+                    "cemerlang": 18,
+                    "baik": 14,
+                    "sederhana": 10,
+                    "kurang": 6
+                }
+            }
+        ]
+    },
+    "test2": {
+        "id": "test2",
+        "title": "Ujian 2 (Ujian Lanjutan & Kemajuan)",
+        "description": "Penilaian fasa kedua dan komponen ujian lanjutan.",
+        "components": [
+            {
+                "key": "bleep_test",
+                "name": "Bleep Test \/ 20m Shuttle Run (Aerobik)",
+                "unit": "tahap",
+                "desc": "Mengukur daya tahan kardiovaskular VO2 Max murid.",
+                "metric_male": {
+                    "cemerlang": 8,
+                    "baik": 6.5,
+                    "sederhana": 4.5,
+                    "kurang": 3
+                },
+                "metric_female": {
+                    "cemerlang": 7,
+                    "baik": 5.5,
+                    "sederhana": 4,
+                    "kurang": 2.5
+                }
+            },
+            {
+                "key": "vertical_jump",
+                "name": "Vertical Jump (Lompat Menegak)",
+                "unit": "cm",
+                "desc": "Mengukur kuasa eksplosif menegak bahagian bawah badan.",
+                "metric_male": {
+                    "cemerlang": 40,
+                    "baik": 34,
+                    "sederhana": 28,
+                    "kurang": 20
+                },
+                "metric_female": {
+                    "cemerlang": 36,
+                    "baik": 30,
+                    "sederhana": 24,
+                    "kurang": 18
+                }
+            },
+            {
+                "key": "medicine_ball",
+                "name": "Medicine Ball Throw (Kuasa Atas Badan)",
+                "unit": "meter",
+                "desc": "Mengukur kekuatan dan kuasa letupan bahu dan dada.",
+                "metric_male": {
+                    "cemerlang": 5.5,
+                    "baik": 4.5,
+                    "sederhana": 3.5,
+                    "kurang": 2.5
+                },
+                "metric_female": {
+                    "cemerlang": 4.79999999999999982236431605997495353221893310546875,
+                    "baik": 3.79999999999999982236431605997495353221893310546875,
+                    "sederhana": 3,
+                    "kurang": 2
+                }
+            }
+        ]
+    }
+}

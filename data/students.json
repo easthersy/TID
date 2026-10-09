@@ -1,110 +1,402 @@
 [
     {
-        "id": "std_farhan10",
+        "id": "std_001",
         "name": "Muhammad Farhan Bin Roslan",
         "gender": "Lelaki",
         "age": 10,
-        "height": 138.19999999999998863131622783839702606201171875,
+        "height": 138.2,
         "weight": 31.5,
         "school": "SK Taman Tun Dr Ismail",
+        "school_code": "SKTTDI2026",
         "class": "4 Cerdik",
-        "created_at": "2026-07-28 12:00:00",
+        "created_at": "2026-09-10 09:00:00",
         "scores": {
-            "sit_reach": [
-                22,
-                24,
-                25
-            ],
-            "sit_up": [
-                18,
-                20
-            ],
-            "long_jump": [
-                160,
-                165
-            ],
-            "sprint_10m": [
-                2.100000000000000088817841970012523233890533447265625
-            ],
-            "shuttle_run": [
-                10.199999999999999289457264239899814128875732421875,
-                9.800000000000000710542735760100185871124267578125
-            ],
-            "hand_eye": [
-                15
-            ]
+            "sit_reach": [24, 25, 26],
+            "sit_up": [22, 24],
+            "long_jump": [165, 170],
+            "sprint_10m": [2.05],
+            "shuttle_run": [9.8, 9.6],
+            "hand_eye": [16]
         }
     },
     {
-        "id": "std_aishah11",
+        "id": "std_002",
         "name": "Aishah Humaira Binti Mohd Yazid",
         "gender": "Perempuan",
         "age": 11,
-        "height": 142,
-        "weight": 34,
+        "height": 142.0,
+        "weight": 34.0,
         "school": "SK Taman Tun Dr Ismail",
+        "school_code": "SKTTDI2026",
         "class": "5 Bestari",
-        "created_at": "2026-07-28 12:05:00",
+        "created_at": "2026-09-10 09:15:00",
         "scores": {
-            "sit_reach": [
-                32,
-                34,
-                35
-            ],
-            "sit_up": [
-                14,
-                15
-            ],
-            "long_jump": [
-                120,
-                125
-            ],
-            "sprint_10m": [
-                2.600000000000000088817841970012523233890533447265625
-            ],
-            "shuttle_run": [
-                12.4000000000000003552713678800500929355621337890625,
-                12
-            ],
-            "hand_eye": [
-                19
-            ]
+            "sit_reach": [32, 34, 35],
+            "sit_up": [18, 20],
+            "long_jump": [140, 145],
+            "sprint_10m": [2.35],
+            "shuttle_run": [11.2, 10.9],
+            "hand_eye": [19]
         }
     },
     {
-        "id": "std_weijie9",
+        "id": "std_003",
         "name": "Chong Wei Jie",
         "gender": "Lelaki",
-        "age": 9,
-        "height": 128.5,
-        "weight": 33.39999999999999857891452847979962825775146484375,
+        "age": 10,
+        "height": 135.0,
+        "weight": 30.0,
         "school": "SK Taman Tun Dr Ismail",
-        "class": "3 Amanah",
-        "created_at": "2026-07-28 12:10:00",
+        "school_code": "SKTTDI2026",
+        "class": "4 Cerdik",
+        "created_at": "2026-09-10 09:30:00",
         "scores": {
-            "sit_reach": [
-                12,
-                14,
-                15
-            ],
-            "sit_up": [
-                8,
-                9
-            ],
-            "long_jump": [
-                98,
-                102
-            ],
-            "sprint_10m": [
-                3.20000000000000017763568394002504646778106689453125
-            ],
-            "shuttle_run": [
-                14.800000000000000710542735760100185871124267578125,
-                14.199999999999999289457264239899814128875732421875
-            ],
-            "hand_eye": [
-                16
-            ]
+            "sit_reach": [18, 19, 20],
+            "sit_up": [15, 17],
+            "long_jump": [135, 140],
+            "sprint_10m": [2.45],
+            "shuttle_run": [11.8, 11.5],
+            "hand_eye": [14]
+        }
+    },
+    {
+        "id": "std_004",
+        "name": "Nur Damia Izzati Binti Kamarul",
+        "gender": "Perempuan",
+        "age": 10,
+        "height": 136.5,
+        "weight": 29.8,
+        "school": "SK Taman Tun Dr Ismail",
+        "school_code": "SKTTDI2026",
+        "class": "4 Gemilang",
+        "created_at": "2026-09-10 09:45:00",
+        "scores": {
+            "sit_reach": [28, 29, 30],
+            "sit_up": [16, 18],
+            "long_jump": [130, 138],
+            "sprint_10m": [2.40],
+            "shuttle_run": [11.4, 11.1],
+            "hand_eye": [17]
+        }
+    },
+    {
+        "id": "std_005",
+        "name": "Haris Danial Bin Syahrul",
+        "gender": "Lelaki",
+        "age": 11,
+        "height": 145.0,
+        "weight": 37.2,
+        "school": "SK Taman Tun Dr Ismail",
+        "school_code": "SKTTDI2026",
+        "class": "5 Bestari",
+        "created_at": "2026-09-11 10:00:00",
+        "scores": {
+            "sit_reach": [20, 22, 22],
+            "sit_up": [26, 28],
+            "long_jump": [175, 180],
+            "sprint_10m": [1.95],
+            "shuttle_run": [9.4, 9.2],
+            "hand_eye": [18]
+        }
+    },
+    {
+        "id": "std_006",
+        "name": "Sarah Batrisyia Binti Azman",
+        "gender": "Perempuan",
+        "age": 11,
+        "height": 140.0,
+        "weight": 33.5,
+        "school": "SK Taman Tun Dr Ismail",
+        "school_code": "SKTTDI2026",
+        "class": "5 Amanah",
+        "created_at": "2026-09-11 10:15:00",
+        "scores": {
+            "sit_reach": [26, 27, 28],
+            "sit_up": [19, 21],
+            "long_jump": [148, 152],
+            "sprint_10m": [2.25],
+            "shuttle_run": [10.6, 10.4],
+            "hand_eye": [15]
+        }
+    },
+    {
+        "id": "std_007",
+        "name": "Adam Harith Bin Zulkifli",
+        "gender": "Lelaki",
+        "age": 12,
+        "height": 152.0,
+        "weight": 42.0,
+        "school": "SK Taman Tun Dr Ismail",
+        "school_code": "SKTTDI2026",
+        "class": "6 Dinamik",
+        "created_at": "2026-09-12 11:00:00",
+        "scores": {
+            "sit_reach": [25, 27, 28],
+            "sit_up": [30, 32],
+            "long_jump": [190, 195],
+            "sprint_10m": [1.88],
+            "shuttle_run": [8.9, 8.7],
+            "hand_eye": [20]
+        }
+    },
+    {
+        "id": "std_008",
+        "name": "Puteri Qistina Binti Ridzuan",
+        "gender": "Perempuan",
+        "age": 12,
+        "height": 149.0,
+        "weight": 38.5,
+        "school": "SK Taman Tun Dr Ismail",
+        "school_code": "SKTTDI2026",
+        "class": "6 Dinamik",
+        "created_at": "2026-09-12 11:15:00",
+        "scores": {
+            "sit_reach": [35, 36, 38],
+            "sit_up": [24, 25],
+            "long_jump": [160, 165],
+            "sprint_10m": [2.15],
+            "shuttle_run": [10.0, 9.8],
+            "hand_eye": [18]
+        }
+    },
+    {
+        "id": "std_009",
+        "name": "Kavinesh a/l Murugan",
+        "gender": "Lelaki",
+        "age": 12,
+        "height": 150.5,
+        "weight": 40.2,
+        "school": "SK Taman Tun Dr Ismail",
+        "school_code": "SKTTDI2026",
+        "class": "6 Kreatif",
+        "created_at": "2026-09-12 11:30:00",
+        "scores": {
+            "sit_reach": [21, 23, 24],
+            "sit_up": [22, 23],
+            "long_jump": [170, 174],
+            "sprint_10m": [2.10],
+            "shuttle_run": [9.9, 9.7],
+            "hand_eye": [16]
+        }
+    },
+    {
+        "id": "std_010",
+        "name": "Danish Hakimi Bin Faizal",
+        "gender": "Lelaki",
+        "age": 10,
+        "height": 137.0,
+        "weight": 32.0,
+        "school": "SK Seri Serdang",
+        "school_code": "SKSS2026",
+        "class": "4 Cerdik",
+        "created_at": "2026-09-15 08:30:00",
+        "scores": {
+            "sit_reach": [21, 22, 23],
+            "sit_up": [20, 22],
+            "long_jump": [155, 160],
+            "sprint_10m": [2.18],
+            "shuttle_run": [10.2, 10.0],
+            "hand_eye": [15]
+        }
+    },
+    {
+        "id": "std_011",
+        "name": "Nurul Iman Binti Syafiq",
+        "gender": "Perempuan",
+        "age": 10,
+        "height": 134.0,
+        "weight": 28.5,
+        "school": "SK Seri Serdang",
+        "school_code": "SKSS2026",
+        "class": "4 Gemilang",
+        "created_at": "2026-09-15 08:45:00",
+        "scores": {
+            "sit_reach": [30, 31, 33],
+            "sit_up": [17, 19],
+            "long_jump": [135, 142],
+            "sprint_10m": [2.30],
+            "shuttle_run": [11.0, 10.8],
+            "hand_eye": [17]
+        }
+    },
+    {
+        "id": "std_012",
+        "name": "Luqman Hakim Bin Johari",
+        "gender": "Lelaki",
+        "age": 11,
+        "height": 144.0,
+        "weight": 36.0,
+        "school": "SK Seri Serdang",
+        "school_code": "SKSS2026",
+        "class": "5 Bestari",
+        "created_at": "2026-09-15 09:00:00",
+        "scores": {
+            "sit_reach": [23, 25, 26],
+            "sit_up": [25, 27],
+            "long_jump": [172, 178],
+            "sprint_10m": [2.00],
+            "shuttle_run": [9.5, 9.3],
+            "hand_eye": [19]
+        }
+    },
+    {
+        "id": "std_013",
+        "name": "Hannah Maisarah Binti Taufik",
+        "gender": "Perempuan",
+        "age": 11,
+        "height": 141.5,
+        "weight": 35.0,
+        "school": "SK Seri Serdang",
+        "school_code": "SKSS2026",
+        "class": "5 Amanah",
+        "created_at": "2026-09-15 09:15:00",
+        "scores": {
+            "sit_reach": [29, 30, 32],
+            "sit_up": [21, 23],
+            "long_jump": [145, 150],
+            "sprint_10m": [2.20],
+            "shuttle_run": [10.5, 10.3],
+            "hand_eye": [16]
+        }
+    },
+    {
+        "id": "std_014",
+        "name": "Muhammad Rayyan Bin Haziq",
+        "gender": "Lelaki",
+        "age": 12,
+        "height": 153.5,
+        "weight": 44.0,
+        "school": "SK Seri Serdang",
+        "school_code": "SKSS2026",
+        "class": "6 Dinamik",
+        "created_at": "2026-09-16 10:00:00",
+        "scores": {
+            "sit_reach": [27, 28, 30],
+            "sit_up": [29, 31],
+            "long_jump": [185, 192],
+            "sprint_10m": [1.90],
+            "shuttle_run": [9.0, 8.8],
+            "hand_eye": [19]
+        }
+    },
+    {
+        "id": "std_015",
+        "name": "Tan Mei Ling",
+        "gender": "Perempuan",
+        "age": 12,
+        "height": 148.0,
+        "weight": 37.0,
+        "school": "SK Seri Serdang",
+        "school_code": "SKSS2026",
+        "class": "6 Kreatif",
+        "created_at": "2026-09-16 10:15:00",
+        "scores": {
+            "sit_reach": [36, 37, 39],
+            "sit_up": [23, 24],
+            "long_jump": [158, 162],
+            "sprint_10m": [2.12],
+            "shuttle_run": [10.1, 9.9],
+            "hand_eye": [18]
+        }
+    },
+    {
+        "id": "std_016",
+        "name": "Ahmad Irfan Bin Khairul",
+        "gender": "Lelaki",
+        "age": 10,
+        "height": 139.0,
+        "weight": 33.0,
+        "school": "SK Putrajaya Presint 9(1)",
+        "school_code": "SKPP9",
+        "class": "4 Cerdik",
+        "created_at": "2026-09-18 08:30:00",
+        "scores": {
+            "sit_reach": [25, 26, 28],
+            "sit_up": [21, 23],
+            "long_jump": [162, 168],
+            "sprint_10m": [2.10],
+            "shuttle_run": [9.9, 9.7],
+            "hand_eye": [17]
+        }
+    },
+    {
+        "id": "std_017",
+        "name": "Zara Sophia Binti Nabil",
+        "gender": "Perempuan",
+        "age": 10,
+        "height": 135.0,
+        "weight": 30.5,
+        "school": "SK Putrajaya Presint 9(1)",
+        "school_code": "SKPP9",
+        "class": "4 Gemilang",
+        "created_at": "2026-09-18 08:45:00",
+        "scores": {
+            "sit_reach": [31, 33, 34],
+            "sit_up": [18, 20],
+            "long_jump": [138, 144],
+            "sprint_10m": [2.28],
+            "shuttle_run": [10.9, 10.7],
+            "hand_eye": [18]
+        }
+    },
+    {
+        "id": "std_018",
+        "name": "Thivagar a/l Selvan",
+        "gender": "Lelaki",
+        "age": 11,
+        "height": 146.0,
+        "weight": 38.0,
+        "school": "SK Putrajaya Presint 9(1)",
+        "school_code": "SKPP9",
+        "class": "5 Bestari",
+        "created_at": "2026-09-18 09:00:00",
+        "scores": {
+            "sit_reach": [22, 24, 25],
+            "sit_up": [27, 29],
+            "long_jump": [178, 183],
+            "sprint_10m": [1.98],
+            "shuttle_run": [9.3, 9.1],
+            "hand_eye": [18]
+        }
+    },
+    {
+        "id": "std_019",
+        "name": "Nur Aina Mardhiah Binti Zaki",
+        "gender": "Perempuan",
+        "age": 11,
+        "height": 142.5,
+        "weight": 36.0,
+        "school": "SK Putrajaya Presint 9(1)",
+        "school_code": "SKPP9",
+        "class": "5 Amanah",
+        "created_at": "2026-09-18 09:15:00",
+        "scores": {
+            "sit_reach": [28, 30, 31],
+            "sit_up": [20, 22],
+            "long_jump": [146, 151],
+            "sprint_10m": [2.22],
+            "shuttle_run": [10.7, 10.5],
+            "hand_eye": [16]
+        }
+    },
+    {
+        "id": "std_020",
+        "name": "Izz Zafran Bin Shahrizal",
+        "gender": "Lelaki",
+        "age": 12,
+        "height": 154.0,
+        "weight": 43.5,
+        "school": "SK Putrajaya Presint 9(1)",
+        "school_code": "SKPP9",
+        "class": "6 Dinamik",
+        "created_at": "2026-09-19 10:00:00",
+        "scores": {
+            "sit_reach": [29, 31, 32],
+            "sit_up": [31, 33],
+            "long_jump": [192, 198],
+            "sprint_10m": [1.85],
+            "shuttle_run": [8.8, 8.6],
+            "hand_eye": [20]
         }
     }
 ]
