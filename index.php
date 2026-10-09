@@ -32,38 +32,88 @@
                 <h3 style="text-align: center; margin-bottom: 1.75rem; font-family: var(--font-outfit);">Pilih Peranan Log Masuk</h3>
                 
                 <div class="role-cards-grid" style="grid-template-columns: repeat(2, 1fr); max-width: 440px; margin: 0 auto;">
-                    <!-- Individu (Akses Penuh) Card -->
-                    <div class="role-card" data-role="Admin" id="card-role-admin" title="Klik untuk terus masuk sebagai Individu (Akses Penuh)">
+                    <!-- Individu Card -->
+                    <div class="role-card" data-role="Admin" id="card-role-admin">
                         <i class="fa-solid fa-user-gear role-card-icon" style="color: var(--accent-primary);"></i>
                         <h4>Individu</h4>
-                        <span style="font-size: 0.72rem; color: #16a34a; font-weight: 600; background: #dcfce7; padding: 0.15rem 0.5rem; border-radius: 12px; margin-top: 0.25rem;">Akses Terus (1-Klik)</span>
+                        <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Pentadbir & Laporan</span>
                     </div>
                     <!-- Sekolah Card -->
-                    <div class="role-card" data-role="Individu" id="card-role-individual" title="Klik untuk pilih sekolah dan masuk ke portal">
+                    <div class="role-card" data-role="Individu" id="card-role-individual">
                         <i class="fa-solid fa-school role-card-icon" style="color: var(--accent-primary);"></i>
                         <h4>Sekolah</h4>
-                        <span style="font-size: 0.72rem; color: #2563eb; font-weight: 600; background: #dbeafe; padding: 0.15rem 0.5rem; border-radius: 12px; margin-top: 0.25rem;">Pilih Sekolah</span>
+                        <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Portal Guru Sekolah</span>
                     </div>
                 </div>
 
-                <!-- Form Log Masuk Sekolah (Pilihan Dropdown Pantas & Kod) -->
-                <div id="school-select-container" style="display: none; margin-top: 1.75rem; text-align: left;">
-                    <div class="form-group" style="margin-bottom: 1.25rem;">
-                        <label for="login-school-select" style="font-family: var(--font-outfit); font-size: 0.85rem; color: var(--text-primary); font-weight: 700;">
-                            <i class="fa-solid fa-school" style="margin-right: 0.35rem; color: var(--accent-primary);"></i> Pilih Sekolah Anda:
+                <!-- 1. Borang Log Masuk Individu (Admin) -->
+                <form id="form-login-admin" style="display: none; margin-top: 1.75rem; text-align: left;">
+                    <div class="form-group" style="margin-bottom: 1.2rem;">
+                        <label for="admin-login-username" style="font-family: var(--font-outfit); font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">
+                            <i class="fa-solid fa-user" style="margin-right: 0.35rem; color: var(--accent-primary);"></i>ID Pengguna Individu
                         </label>
-                        <select id="login-school-select" class="form-control" style="font-size: 0.95rem; padding: 0.65rem 0.85rem;">
+                        <input type="text" id="admin-login-username" class="form-control" placeholder="Contoh: admin" required autocomplete="username">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1.2rem;">
+                        <label for="admin-login-password" style="font-family: var(--font-outfit); font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">
+                            <i class="fa-solid fa-lock" style="margin-right: 0.35rem; color: var(--accent-primary);"></i>Kata Laluan
+                        </label>
+                        <input type="password" id="admin-login-password" class="form-control" placeholder="Masukkan kata laluan..." required autocomplete="current-password">
+                    </div>
+
+                    <p id="admin-login-error" style="color: var(--color-danger); font-size: 0.82rem; margin-top: 0.25rem; margin-bottom: 0.75rem; display: none;"></p>
+
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.6rem 0.85rem; margin-bottom: 1.25rem; font-size: 0.78rem; color: #475569;">
+                        <i class="fa-solid fa-circle-info" style="color: var(--accent-primary); margin-right: 0.3rem;"></i> <strong>Maklumat Lalai:</strong> ID: <code>admin</code> | Kata Laluan: <code>admin123</code>
+                    </div>
+
+                    <div style="display: flex; gap: 0.75rem;">
+                        <button type="button" class="btn btn-secondary btn-login-back" style="flex: 1; justify-content: center;">Kembali</button>
+                        <button type="submit" class="btn btn-primary" style="flex: 2; justify-content: center;">
+                            <i class="fa-solid fa-right-to-bracket"></i> Log Masuk Individu
+                        </button>
+                    </div>
+                </form>
+
+                <!-- 2. Borang Log Masuk Sekolah -->
+                <form id="form-login-school" style="display: none; margin-top: 1.75rem; text-align: left;">
+                    <div class="form-group" style="margin-bottom: 1.2rem;">
+                        <label for="school-login-select" style="font-family: var(--font-outfit); font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">
+                            <i class="fa-solid fa-school" style="margin-right: 0.35rem; color: var(--accent-primary);"></i>Pilih Sekolah Anda
+                        </label>
+                        <select id="school-login-select" class="form-control" style="font-size: 0.92rem;">
                             <option value="" disabled selected>Pilih Sekolah Berdaftar...</option>
                         </select>
                     </div>
 
-                    <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem;">
-                        <button type="button" class="btn btn-secondary" id="btn-school-back" style="flex: 1; justify-content: center;">Kembali</button>
-                        <button type="button" class="btn btn-primary" id="btn-school-enter" style="flex: 2; justify-content: center;">
-                            <i class="fa-solid fa-right-to-bracket"></i> Masuk Portal Sekolah
+                    <div class="form-group" style="margin-bottom: 1.2rem;">
+                        <label for="school-login-code" style="font-family: var(--font-outfit); font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">
+                            <i class="fa-solid fa-key" style="margin-right: 0.35rem; color: var(--accent-primary);"></i>Kod Sekolah
+                        </label>
+                        <input type="text" id="school-login-code" class="form-control" placeholder="Contoh: SKTTDI2026" style="text-transform: uppercase; font-weight: 600; letter-spacing: 1px;" required>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1.2rem;">
+                        <label for="school-login-password" style="font-family: var(--font-outfit); font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">
+                            <i class="fa-solid fa-lock" style="margin-right: 0.35rem; color: var(--accent-primary);"></i>Kata Laluan Sekolah
+                        </label>
+                        <input type="password" id="school-login-password" class="form-control" placeholder="Masukkan kata laluan sekolah..." required>
+                    </div>
+
+                    <p id="school-login-error" style="color: var(--color-danger); font-size: 0.82rem; margin-top: 0.25rem; margin-bottom: 0.75rem; display: none;"></p>
+
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.6rem 0.85rem; margin-bottom: 1.25rem; font-size: 0.78rem; color: #475569;">
+                        <i class="fa-solid fa-circle-info" style="color: var(--accent-primary); margin-right: 0.3rem;"></i> <strong>Maklumat Lalai:</strong> Kod: <code>SKTTDI2026</code> | Kata Laluan: <code>tid123</code>
+                    </div>
+
+                    <div style="display: flex; gap: 0.75rem;">
+                        <button type="button" class="btn btn-secondary btn-login-back" style="flex: 1; justify-content: center;">Kembali</button>
+                        <button type="submit" class="btn btn-primary" style="flex: 2; justify-content: center;">
+                            <i class="fa-solid fa-right-to-bracket"></i> Log Masuk Sekolah
                         </button>
                     </div>
-                </div>
+                </form>
             </div>
             
             <div class="login-footer">
